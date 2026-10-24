@@ -959,3 +959,26 @@ See the repository for the applicable license and project terms.
 💻 GitHub: https://github.com/Inda-Obanyi/floodguard-ninja
 
 👤 Portfolio: https://indaobanyi.vercel.app
+
+---
+
+## Engineering case study | Recruiter overview
+
+### FloodGuard AI
+
+**Status:** Flood awareness MVP; predictive alerts in development
+
+**Why this project exists:** Make practical flood-safety information accessible to Nigerian communities.
+
+**Development process:** Research → flood-information design → AI-assisted guidance → prototype deployment → accessibility roadmap.
+
+**Evidence and limitations:** A deployed information prototype; predictive accuracy has not been validated.
+
+**Planned outcome:** Integrate verified environmental data, risk forecasting, SMS/USSD and WhatsApp alerts.
+
+**Engineering value:** Demonstrates problem definition, end-to-end implementation, critical evaluation, clear documentation and practical iteration.
+
+**[Live MVP / demo](https://3e7e648e.mydala.app)** · **[Source code](https://github.com/Yaqini-Duniya-Technology/floodguard-ninja)**
+
+**Developer:** Inda Obanyi · AI/ML Engineer & Software Developer · Founder, Yaqini & Duniya Technology  
+**[Portfolio](https://indaobanyi.vercel.app)** · **[LinkedIn](https://www.linkedin.com/in/inda-obanyi-8886553a6/)** · **[GitHub](https://github.com/Inda-Obanyi)**
