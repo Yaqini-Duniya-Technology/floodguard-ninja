@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: floodguard-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: FLOODGUARD_ENV
+        value: production
+      - key: FLOODGUARD_ALLOWED_ORIGINS
+        sync: false
+      - key: FLOODGUARD_DB_PATH
+        sync: false
+      - key: NIPOST_INTEGRATION_ENABLED
+        value: 'false'

@@ -57,22 +57,22 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 text-accent shrink-0 mt-0.5" />
-                <span>Government Secretariat, Lokoja, Kogi State, Nigeria</span>
+                <span>Nigeria — digital service; no physical office verified</span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-accent shrink-0" />
-                <span>112 (Emergency) | +234 800 FLOOD</span>
+                <span>112 (Nigeria emergency services)</span>
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-accent shrink-0" />
-                <span>support@floodguard.ai</span>
+                <span>Contact details pending verification</span>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="mt-12 pt-8 border-t border-primary-foreground/10 text-center text-sm text-primary-foreground/60">
-          <p>© {new Date().getFullYear()} FLOODGUARD 9JA. Saving Lives Through Artificial Intelligence.</p>
+          <p>© {new Date().getFullYear()} FloodGuard AI — Developed by Yaqini & Duniya Technology. Prototype: not an emergency dispatch service.</p>
         </div>
       </div>
     </footer>

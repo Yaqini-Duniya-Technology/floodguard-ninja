@@ -9,11 +9,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { storage } from "@/lib/storage";
+import { submitFloodReport } from "@/lib/reportApi";
+import { resolvePostcode } from "@/lib/postcodeApi";
 
 export default function ReportFlood() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [postcode, setPostcode] = React.useState("");
+  const [postcodeBusy, setPostcodeBusy] = React.useState(false);
+  const [postcodeMessage, setPostcodeMessage] = React.useState("");
   const [isSuccess, setIsSuccess] = React.useState(false);
+  const [receiptId, setReceiptId] = React.useState("");
+  const [receiptToken, setReceiptToken] = React.useState("");
   const [filePreview, setFilePreview] = React.useState<string | null>(null);
   const [formData, setFormData] = React.useState({
     type: "",
@@ -22,24 +28,44 @@ export default function ReportFlood() {
     description: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const checkPostcode = async () => {
+    setPostcodeBusy(true);
+    setPostcodeMessage("");
+    try {
+      const result = await resolvePostcode(postcode);
+      if (result.status === "verified") {
+        setPostcodeMessage(`Verified: ${[result.lga, result.state].filter(Boolean).join(", ") || result.postcode}. Confirm your location below.`);
+      } else {
+        setPostcodeMessage("Postcode could not be verified. Enter a descriptive location below.");
+      }
+    } catch (error) {
+      setPostcodeMessage(error instanceof Error ? error.message : "Postcode lookup unavailable.");
+    } finally {
+      setPostcodeBusy(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.type || !formData.severity || !formData.location) {
       toast.error("Please fill in all required fields");
       return;
     }
-
     setIsSubmitting(true);
-    setTimeout(() => {
-      storage.saveReport({
-        ...formData,
-        image: filePreview || undefined
-      });
+    try {
+      const receipt = await submitFloodReport({ ...formData, postcode: postcode.trim() || undefined });
+      setReceiptId(receipt.id);
+      setReceiptToken(receipt.receipt_token);
       setFormData({ type: "", severity: "", location: "", description: "" });
-      setIsSubmitting(false);
+      setFilePreview(null);
+      setPostcode("");
       setIsSuccess(true);
-      toast.success("Report submitted successfully! AI is analyzing your data.");
-    }, 2000);
+      toast.success("Report received by FloodGuard. It is pending review; emergency services were not notified.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to submit report.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,7 +94,7 @@ export default function ReportFlood() {
             </h1>
             <p className="text-muted-foreground text-lg">
               Report rising water levels, blocked drainages, or flooded roads in your area. 
-              Your reports help our AI improve accuracy and save lives.
+              Reports are stored for review when the central service is available. For immediate danger, call 112.
             </p>
           </div>
 
@@ -84,8 +110,9 @@ export default function ReportFlood() {
                 </div>
                 <h2 className="text-3xl font-bold text-primary mb-4">Report Received!</h2>
                 <p className="text-muted-foreground mb-8 text-lg">
-                  Thank you for contributing to community safety. Emergency responders in your LGA have been notified.
+                  Thank you for contributing to community safety. Your report is pending review. Emergency responders have not been automatically notified.
                 </p>
+                {receiptId && <div className="mb-5 text-sm break-all space-y-2 text-left bg-muted p-4 rounded-lg"><p>Report reference: <strong>{receiptId}</strong></p><p>Private receipt token: <strong>{receiptToken}</strong></p><p>Save both values securely to check your report status. The token is displayed only now. This is not emergency dispatch.</p><Button type="button" variant="secondary" onClick={() => { navigator.clipboard?.writeText(`Reference: ${receiptId}\nReceipt token: ${receiptToken}`).then(() => toast.success("Receipt copied")).catch(() => toast.error("Copy unavailable; save both values manually")); }}>Copy receipt</Button></div>}
                 <Button onClick={() => { setIsSuccess(false); setFilePreview(null); }} variant="outline" size="lg">Submit Another Report</Button>
               </motion.div>
             ) : (
@@ -134,6 +161,15 @@ export default function ReportFlood() {
                       </div>
 
                       <div className="space-y-2">
+                        <Label htmlFor="digital-postcode">Nigerian Digital Postcode (optional)</Label>
+                        <div className="flex gap-2">
+                          <Input id="digital-postcode" value={postcode} maxLength={40} onChange={(e) => { setPostcode(e.target.value); setPostcodeMessage(""); }} placeholder="Enter your digital postcode" />
+                          <Button type="button" variant="outline" onClick={checkPostcode} disabled={postcodeBusy || !postcode.trim()}>{postcodeBusy ? "Checking..." : "Verify"}</Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground" role="status">{postcodeMessage || "Official postcode verification is pending NIPOST developer access. You can still describe your location manually."}</p>
+                      </div>
+
+                      <div className="space-y-2">
                         <Label>Specific Location</Label>
                         <div className="relative">
                           <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -145,7 +181,7 @@ export default function ReportFlood() {
                             onChange={(e) => updateField("location", e.target.value)}
                           />
                         </div>
-                        <p className="text-[10px] text-muted-foreground">Your GPS coordinates will be automatically attached if you grant permission.</p>
+                        <p className="text-[10px] text-muted-foreground">Enter a clear location description. GPS coordinates are not automatically attached.</p>
                       </div>
 
                       <div className="space-y-2">
@@ -186,12 +222,12 @@ export default function ReportFlood() {
                                 <Camera className="h-8 w-8 text-primary" />
                               </div>
                               <p className="text-sm font-medium">Click to upload or drag and drop</p>
-                              <p className="text-xs text-muted-foreground mt-1">PNG, JPG or MP4 (Max 20MB)</p>
+                              <p className="text-xs text-muted-foreground mt-1">Local preview only. Media is not uploaded with this report.</p>
                             </>
                           )}
                           <input 
                             type="file" 
-                            accept="image/*,video/*" 
+                            accept="image/*"
                             className="absolute inset-0 opacity-0 cursor-pointer" 
                             onChange={handleFileChange}
                           />
@@ -207,7 +243,7 @@ export default function ReportFlood() {
                         ) : (
                           <div className="flex items-center gap-2">
                             <Send className="h-5 w-5" />
-                            Submit Report to AI
+                            Submit Flood Report
                           </div>
                         )}
                       </Button>

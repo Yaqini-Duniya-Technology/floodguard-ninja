@@ -9,7 +9,7 @@ interface EmergencyModalProps {
 }
 
 const COUNTDOWN_SECONDS = 10;
-const EMERGENCY_NUMBER = "911";
+const EMERGENCY_NUMBER = "112";
 
 export function EmergencyModal({ open, onClose }: EmergencyModalProps) {
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
@@ -48,8 +48,9 @@ export function EmergencyModal({ open, onClose }: EmergencyModalProps) {
 
   const handleEmergencyCall = useCallback(() => {
     setIsCalling(true);
-    toast.error(`🚨 EMERGENCY — Calling ${EMERGENCY_NUMBER}`, {
-      description: "Help is on the way. Stay on the line.",
+    window.location.href = `tel:${EMERGENCY_NUMBER}`;
+    toast.error(`Open phone dialler: ${EMERGENCY_NUMBER}`, {
+      description: "Complete the call in your phone app. FloodGuard cannot confirm that a call connected.",
       duration: 5000,
     });
   }, []);
@@ -70,7 +71,7 @@ export function EmergencyModal({ open, onClose }: EmergencyModalProps) {
 
   const handleSendLocation = useCallback(() => {
     toast("Location sharing initiated", {
-      description: "Sending your current coordinates to emergency services",
+      description: "Automatic location sharing is not connected. Tell the operator your location during the call.",
       icon: "📍",
       duration: 4000,
     });
@@ -119,7 +120,7 @@ export function EmergencyModal({ open, onClose }: EmergencyModalProps) {
                       Emergency SOS
                     </h2>
                     <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                      Help is being prepared
+                      Use your phone to contact emergency services
                     </p>
                   </div>
                 </div>
@@ -138,7 +139,7 @@ export function EmergencyModal({ open, onClose }: EmergencyModalProps) {
                   <>
                     <div className="mb-4 text-center">
                       <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                        Auto-calling emergency services in
+                        Opening emergency dialler in
                       </p>
                       <motion.p
                         key={countdown}
@@ -206,10 +207,10 @@ export function EmergencyModal({ open, onClose }: EmergencyModalProps) {
                         </motion.div>
                       </motion.div>
                       <p className="text-lg font-bold text-zinc-900 dark:text-white">
-                        Calling {EMERGENCY_NUMBER}...
+                        Dial {EMERGENCY_NUMBER} on your phone
                       </p>
                       <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                        Stay calm. Help is on the way.
+                        Complete the call in your phone app. No dispatch is confirmed.
                       </p>
                     </div>
 

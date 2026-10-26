@@ -1,4 +1,3 @@
-# Secrets and local configuration
 .env
 .env.*
 !.env.example
@@ -7,24 +6,23 @@
 **/.env.*
 !**/.env.example
 !**/.env.production.example
-# Python runtime and test artifacts
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .venv/
 venv/
-# Databases and backups
 *.sqlite
 *.sqlite3
-*.db
 *.sqlite3-*
+*.db
 *.db-*
-# Frontend build and dependencies
 node_modules/
 dist/
 coverage/
 *.log
-# OS and editor
 .DS_Store
 Thumbs.db
-.vscode/
+
+src/pages/*.bak
+
+*.bak
