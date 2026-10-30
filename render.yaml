@@ -1,4 +1,4 @@
-services:
+﻿services:
   - type: web
     name: floodguard-api
     runtime: python
@@ -9,9 +9,9 @@ services:
     envVars:
       - key: FLOODGUARD_ENV
         value: production
-      - key: FLOODGUARD_ALLOWED_ORIGINS
+      - key: DATABASE_URL
         sync: false
-      - key: FLOODGUARD_DB_PATH
+      - key: FLOODGUARD_ALLOWED_ORIGINS
         sync: false
       - key: NIPOST_INTEGRATION_ENABLED
         value: 'false'

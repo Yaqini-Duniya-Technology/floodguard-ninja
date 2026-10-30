@@ -26,3 +26,4 @@ Thumbs.db
 src/pages/*.bak
 
 *.bak
+.pytest_temp/

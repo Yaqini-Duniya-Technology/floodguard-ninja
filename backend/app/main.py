@@ -51,25 +51,25 @@ def _json_error(status: int, detail: str):
 
 @contextmanager
 def connection():
-    if os.getenv("FLOODGUARD_ENV") == "production" and not os.getenv("FLOODGUARD_DB_PATH"):
-        raise RuntimeError("Production requires FLOODGUARD_DB_PATH on durable storage")
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with closing(sqlite3.connect(DB_PATH, timeout=10)) as connection:
-        with connection as db:
-            db.row_factory = sqlite3.Row
-            db.execute("PRAGMA busy_timeout=10000")
-            db.execute("PRAGMA journal_mode=WAL")
-            db.execute("""CREATE TABLE IF NOT EXISTS reports (
-                id TEXT PRIMARY KEY, type TEXT NOT NULL, severity TEXT NOT NULL,
-                location TEXT NOT NULL, description TEXT NOT NULL,
-                timestamp TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'PENDING')""")
-            db.execute("CREATE INDEX IF NOT EXISTS idx_reports_timestamp ON reports(timestamp)")
-            db.execute("""CREATE TABLE IF NOT EXISTS report_receipts (
-                report_id TEXT PRIMARY KEY, token_hash TEXT NOT NULL,
-                FOREIGN KEY(report_id) REFERENCES reports(id))""")
-            db.execute("""CREATE TABLE IF NOT EXISTS report_idempotency (
-                key_hash TEXT PRIMARY KEY, payload_hash TEXT NOT NULL, report_id TEXT NOT NULL)""")
-            yield db
+    """Open an initialized database transaction."""
+    from .database import (
+        DatabaseSession,
+        database_engine,
+        initialize_schema,
+        open_database,
+    )
+
+    engine = database_engine()
+
+    with open_database(DB_PATH) as db:
+        # Local SQLite databases are initialized automatically so that
+        # development and isolated tests can use temporary database files.
+        # PostgreSQL schema creation is handled by a separate setup command.
+        if engine == "sqlite":
+            initialize_schema(db)
+
+        yield DatabaseSession(db, engine)
+
 
 class ReportIn(BaseModel):
     type: str = Field(min_length=1, max_length=80)
@@ -124,27 +124,76 @@ def create_report(payload: ReportIn, request: Request):
     if idempotency and not re.fullmatch(r"[a-zA-Z0-9_-]{8,128}", idempotency):
         raise HTTPException(400, "Invalid Idempotency-Key")
     key_hash = hashlib.sha256(idempotency.encode()).hexdigest() if idempotency else None
-    if key_hash:
-        with connection() as db:
-            existing = db.execute("SELECT payload_hash, report_id FROM report_idempotency WHERE key_hash=?", (key_hash,)).fetchone()
-            if existing:
-                if existing["payload_hash"] != payload_hash:
-                    raise HTTPException(409, "Idempotency key reused with different report")
-                raise HTTPException(409, "Report already submitted; use the receipt from the original response")
     receipt_token = secrets.token_urlsafe(32)
-    record = ReportOut(**payload.model_dump(), id=str(uuid.uuid4()), timestamp=datetime.now(timezone.utc).isoformat(), status="PENDING", receipt_token=receipt_token)
-    with connection() as db:
-        db.execute("INSERT INTO reports (id,type,severity,location,description,timestamp,status) VALUES (?,?,?,?,?,?,?)", (record.id, record.type, record.severity, record.location, record.description, record.timestamp, record.status))
-        db.execute("INSERT INTO report_receipts (report_id, token_hash) VALUES (?,?)", (record.id, hashlib.sha256(receipt_token.encode()).hexdigest()))
-        if key_hash:
-            try:
-                db.execute("INSERT INTO report_idempotency VALUES (?,?,?)", (key_hash, payload_hash, record.id))
-            except sqlite3.IntegrityError:
-                raise HTTPException(409, "Report submission already processed")
-        # The optional postcode is unverified and is never treated as verified geolocation.
-        db.execute("CREATE TABLE IF NOT EXISTS report_postcodes (report_id TEXT PRIMARY KEY, postcode TEXT, verification_status TEXT NOT NULL)")
-        if record.postcode:
-            db.execute("INSERT INTO report_postcodes VALUES (?,?,?)", (record.id, record.postcode.strip().upper(), "UNVERIFIED"))
+    record = ReportOut(
+        **payload.model_dump(),
+        id=str(uuid.uuid4()),
+        timestamp=datetime.now(timezone.utc).isoformat(),
+        status="PENDING",
+        receipt_token=receipt_token,
+    )
+
+    from psycopg.errors import UniqueViolation
+
+    try:
+        with connection() as db:
+            if key_hash:
+                existing = db.execute(
+                    "SELECT payload_hash, report_id FROM report_idempotency WHERE key_hash=?",
+                    (key_hash,),
+                ).fetchone()
+
+                if existing:
+                    if existing["payload_hash"] != payload_hash:
+                        raise HTTPException(409, "Idempotency key reused with different report")
+                    raise HTTPException(
+                        409,
+                        "Report already submitted; use the receipt from the original response",
+                    )
+
+            db.execute(
+                """INSERT INTO reports
+                (id,type,severity,location,description,timestamp,status)
+                VALUES (?,?,?,?,?,?,?)""",
+                (
+                    record.id,
+                    record.type,
+                    record.severity,
+                    record.location,
+                    record.description,
+                    record.timestamp,
+                    record.status,
+                ),
+            )
+
+            db.execute(
+                "INSERT INTO report_receipts (report_id, token_hash) VALUES (?,?)",
+                (
+                    record.id,
+                    hashlib.sha256(receipt_token.encode()).hexdigest(),
+                ),
+            )
+
+            if key_hash:
+                db.execute(
+                    "INSERT INTO report_idempotency VALUES (?,?,?)",
+                    (key_hash, payload_hash, record.id),
+                )
+
+            if record.postcode:
+                db.execute(
+                    "INSERT INTO report_postcodes VALUES (?,?,?)",
+                    (record.id, record.postcode.strip().upper(), "UNVERIFIED"),
+                )
+
+    except HTTPException:
+        raise
+    except (sqlite3.IntegrityError, UniqueViolation) as exc:
+        raise HTTPException(
+            status_code=409,
+            detail="Report submission already processed",
+        ) from exc
+
     return record
 
 @app.get("/api/v1/reports/{report_id}/status")
