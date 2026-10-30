@@ -9,5 +9,5 @@
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["vite.config.mts"]
+  "include": ["vite.config.ts"]
 }
