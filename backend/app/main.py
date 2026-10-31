@@ -76,7 +76,7 @@ class ReportIn(BaseModel):
     severity: str = Field(min_length=1, max_length=30)
     location: str = Field(min_length=2, max_length=240)
     description: str = Field(default="", max_length=3000)
-    postcode: str | None = Field(default=None, max_length=40)
+    postcode: str | None = Field(default=None, max_length=40, description="User-supplied postcode; never implies official NIPOST verification.")
 
     @field_validator("type", "severity", "location", "description")
     @classmethod
