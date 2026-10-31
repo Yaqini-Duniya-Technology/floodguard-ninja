@@ -113,7 +113,12 @@ class ReportIn(BaseModel):
             raise ValueError("Postcode must contain 11 letters/digits (format check only)")
         return normalized
 
-class ReportOut(ReportIn):
+class ReportOut(BaseModel):
+    type: str
+    severity: str
+    location: str
+    description: str
+    postcode: str | None = None
     id: str
     timestamp: str
     status: str
