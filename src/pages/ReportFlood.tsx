@@ -225,7 +225,7 @@ export default function ReportFlood() {
                       <div className="space-y-2">
                         <Label>Optional GPS coordinates</Label>
                         <Button type="button" variant="outline" disabled={gpsBusy} onClick={captureGps}>{gpsBusy ? "Locating..." : "Use my current location"}</Button>
-                        <p role="status" className="text-xs text-muted-foreground">{gpsMessage || "Location permission is optional. Coordinates are not transmitted until explicitly included in a future supported report workflow."}</p>
+                        <p role="status" className="text-xs text-muted-foreground">{gpsMessage || "Location permission is optional. Coordinates are included only when you explicitly select them for submission."}</p>
                         <div className="grid grid-cols-2 gap-3">
                           <Input aria-label="Manual latitude" placeholder="Latitude (-90 to 90)" inputMode="decimal" value={manualCoords.latitude} onChange={e=>setManualCoords(p=>({...p,latitude:e.target.value}))}/>
                           <Input aria-label="Manual longitude" placeholder="Longitude (-180 to 180)" inputMode="decimal" value={manualCoords.longitude} onChange={e=>setManualCoords(p=>({...p,longitude:e.target.value}))}/>
@@ -233,7 +233,7 @@ export default function ReportFlood() {
                         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={useManualCoordinates} onChange={e=>{setUseManualCoordinates(e.target.checked); if(e.target.checked)setUseGpsCoordinates(false);}}/> Include manually entered coordinates with my report</label>
                         <p className="text-xs text-muted-foreground">Only one coordinate source can be submitted. Coordinates are sensitive location data. They are saved only if you explicitly select GPS or manual coordinates. For immediate danger, call 112.</p>
                         {!manualCoordinateValid && <p role="alert" className="text-xs text-red-700">Enter both coordinates within valid ranges or leave both blank.</p>}
-                        {gpsLocation && <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={useGpsCoordinates} onChange={e=>{setUseGpsCoordinates(e.target.checked); if (e.target.checked) setUseManualCoordinates(false); if(e.target.checked)setUseManualCoordinates(false);}}/> Use captured GPS as my preferred coordinates (not yet submitted)</label>}
+                        {gpsLocation && <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={useGpsCoordinates} onChange={e=>{setUseGpsCoordinates(e.target.checked); if (e.target.checked) setUseManualCoordinates(false);}}/> Include captured GPS coordinates with my report</label>}
                         {gpsLocation && <Button type="button" variant="ghost" onClick={() => { gpsRequestRef.current++; setGpsBusy(false); setGpsLocation(null); setUseGpsCoordinates(false); setGpsMessage("Captured coordinates discarded."); }}>Discard coordinates</Button>}
                         {gpsLocation && <p className="text-xs">Latitude {gpsLocation.latitude.toFixed(5)}, longitude {gpsLocation.longitude.toFixed(5)}; estimated accuracy ±{Math.round(gpsLocation.accuracy)} m. GPS is not NIPOST verification.</p>}
                       </div>
