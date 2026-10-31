@@ -51,6 +51,22 @@ export default function ReportFlood() {
     }
   };
 
+  const captureGps = () => {
+    if (!navigator.geolocation) { setGpsMessage("GPS is unavailable in this browser. Enter a location manually."); return; }
+    setGpsBusy(true);
+    setGpsMessage("Requesting location permission...");
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        const {latitude, longitude, accuracy} = position.coords;
+        setGpsLocation({latitude, longitude, accuracy});
+        setGpsMessage("Coordinates captured. Confirm the reported location before submitting.");
+        setGpsBusy(false);
+      },
+      () => { setGpsMessage("Location was not available or permission was denied. Enter a location manually."); setGpsBusy(false); },
+      {enableHighAccuracy: true, timeout: 12000, maximumAge: 0}
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.type || !formData.severity || !formData.location.trim() || !formData.description.trim()) {
