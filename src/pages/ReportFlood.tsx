@@ -18,6 +18,9 @@ export default function ReportFlood() {
   const [postcodeBusy, setPostcodeBusy] = React.useState(false);
   const [postcodeMessage, setPostcodeMessage] = React.useState("");
   const [postcodeVerified, setPostcodeVerified] = React.useState(false);
+  const [gpsBusy, setGpsBusy] = React.useState(false);
+  const [gpsMessage, setGpsMessage] = React.useState("");
+  const [gpsLocation, setGpsLocation] = React.useState<{latitude:number;longitude:number;accuracy:number}|null>(null);
   const [isSuccess, setIsSuccess] = React.useState(false);
   const [receiptId, setReceiptId] = React.useState("");
   const [receiptToken, setReceiptToken] = React.useState("");
