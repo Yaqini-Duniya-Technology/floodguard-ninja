@@ -196,7 +196,7 @@ export default function ReportFlood() {
                       </div>
 
                       <div className="space-y-4">
-                        <Label>Photos or Videos</Label>
+                        <Label>Photo preview (not uploaded)</Label>
                         <div 
                           className={cn(
                             "border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center transition-colors relative overflow-hidden",
@@ -221,7 +221,7 @@ export default function ReportFlood() {
                               <div className="bg-primary/5 p-4 rounded-full mb-4">
                                 <Camera className="h-8 w-8 text-primary" />
                               </div>
-                              <p className="text-sm font-medium">Click to upload or drag and drop</p>
+                              <p className="text-sm font-medium">Select an image for local preview</p>
                               <p className="text-xs text-muted-foreground mt-1">Local preview only. Media is not uploaded with this report.</p>
                             </>
                           )}
@@ -238,7 +238,7 @@ export default function ReportFlood() {
                         {isSubmitting ? (
                           <div className="flex items-center gap-2">
                             <Waves className="h-5 w-5 animate-bounce" />
-                            Uploading Report...
+                            Submitting Report...
                           </div>
                         ) : (
                           <div className="flex items-center gap-2">
