@@ -63,6 +63,9 @@ export default function ReportFlood() {
       position => {
         if (requestId !== gpsRequestRef.current) return;
         const {latitude, longitude, accuracy} = position.coords;
+        if (![latitude, longitude, accuracy].every(Number.isFinite) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180 || accuracy < 0) {
+          setGpsMessage("Location reading was invalid. Enter a location manually."); setGpsBusy(false); return;
+        }
         setGpsLocation({latitude, longitude, accuracy});
         setGpsMessage("Coordinates captured. Confirm the reported location before submitting.");
         setGpsBusy(false);
