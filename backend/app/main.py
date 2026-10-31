@@ -194,6 +194,16 @@ def create_report(payload: ReportIn, request: Request):
                     (key_hash, payload_hash, record.id),
                 )
 
+            if record.latitude is not None:
+                db.execute(
+                    """INSERT INTO report_coordinates
+                    (report_id,latitude,longitude,source,accuracy_m,consent_at)
+                    VALUES (?,?,?,?,?,?)""",
+                    (record.id, record.latitude, record.longitude,
+                     record.coordinate_source, record.accuracy_m,
+                     datetime.now(timezone.utc).isoformat()),
+                )
+
             if record.postcode:
                 db.execute(
                     "INSERT INTO report_postcodes VALUES (?,?,?)",
