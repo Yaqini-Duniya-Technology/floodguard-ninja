@@ -91,6 +91,8 @@ class ReportIn(BaseModel):
             raise ValueError("Coordinates require latitude, longitude and source")
         if self.latitude is not None and not self.coordinate_consent:
             raise ValueError("Explicit coordinate consent is required")
+        if self.coordinate_consent and self.latitude is None:
+            raise ValueError("Coordinate consent requires selected coordinates")
         if self.accuracy_m is not None and self.coordinate_source != "gps":
             raise ValueError("Accuracy requires GPS source")
         return self
