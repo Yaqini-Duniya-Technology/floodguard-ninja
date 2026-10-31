@@ -22,6 +22,7 @@ export default function ReportFlood() {
   const [gpsMessage, setGpsMessage] = React.useState("");
   const [gpsLocation, setGpsLocation] = React.useState<{latitude:number;longitude:number;accuracy:number}|null>(null);
   const [manualCoords, setManualCoords] = React.useState({latitude:"",longitude:""});
+  const [gpsRequestId, setGpsRequestId] = React.useState(0);
   const [isSuccess, setIsSuccess] = React.useState(false);
   const [receiptId, setReceiptId] = React.useState("");
   const [receiptToken, setReceiptToken] = React.useState("");
