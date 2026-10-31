@@ -75,6 +75,7 @@ export default function ReportFlood() {
     }
     setIsSubmitting(true);
     try {
+      // GPS coordinates are intentionally not transmitted: backend coordinate persistence and consent audit are not deployed.
       const receipt = await submitFloodReport({ ...formData, postcode: postcode.trim() || undefined });
       setReceiptId(receipt.id);
       setReceiptToken(receipt.receipt_token);
