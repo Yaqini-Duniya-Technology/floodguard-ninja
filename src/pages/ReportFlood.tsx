@@ -17,7 +17,6 @@ export default function ReportFlood() {
   const [postcode, setPostcode] = React.useState("");
   const [postcodeBusy, setPostcodeBusy] = React.useState(false);
   const [postcodeMessage, setPostcodeMessage] = React.useState("");
-  const [postcodeVerified, setPostcodeVerified] = React.useState(false);
   const [gpsBusy, setGpsBusy] = React.useState(false);
   const [gpsMessage, setGpsMessage] = React.useState("");
   const [gpsLocation, setGpsLocation] = React.useState<{latitude:number;longitude:number;accuracy:number}|null>(null);
@@ -36,11 +35,9 @@ export default function ReportFlood() {
   const checkPostcode = async () => {
     setPostcodeBusy(true);
     setPostcodeMessage("");
-    setPostcodeVerified(false);
     try {
       const result = await resolvePostcode(postcode);
       if (result.status === "verified") {
-        setPostcodeVerified(true);
         setPostcodeMessage(`Verified: ${[result.lga, result.state].filter(Boolean).join(", ") || result.postcode}. Confirm your location below.`);
       } else {
         setPostcodeMessage("Postcode could not be verified. Enter a descriptive location below.");
@@ -92,7 +89,6 @@ export default function ReportFlood() {
       setFormData({ type: "", severity: "", location: "", description: "" });
       setFilePreview(null);
       setPostcode("");
-      setPostcodeVerified(false);
       gpsRequestRef.current++;
       setGpsLocation(null);
       setGpsMessage("");
@@ -208,7 +204,7 @@ export default function ReportFlood() {
                       <div className="space-y-2">
                         <Label htmlFor="digital-postcode">Nigerian Digital Postcode (optional)</Label>
                         <div className="flex gap-2">
-                          <Input id="digital-postcode" value={postcode} maxLength={40} onChange={(e) => { setPostcode(e.target.value); setPostcodeMessage(""); setPostcodeVerified(false); }} placeholder="Enter your digital postcode" />
+                          <Input id="digital-postcode" value={postcode} maxLength={40} onChange={(e) => { setPostcode(e.target.value); setPostcodeMessage(""); }} placeholder="Enter your digital postcode" />
                           <Button type="button" variant="outline" onClick={checkPostcode} disabled={postcodeBusy || !postcode.trim()}>{postcodeBusy ? "Checking..." : "Verify"}</Button>
                         </div>
                         <p className="text-xs text-muted-foreground" role="status">{postcodeMessage || "Official postcode verification is pending NIPOST developer access. An entered postcode is unverified until the official lookup succeeds."}</p>
