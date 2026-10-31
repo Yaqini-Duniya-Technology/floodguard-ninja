@@ -148,7 +148,7 @@ def create_report(payload: ReportIn, request: Request):
     key_hash = hashlib.sha256(idempotency.encode()).hexdigest() if idempotency else None
     receipt_token = secrets.token_urlsafe(32)
     record = ReportOut(
-        **payload.model_dump(),
+        **payload.model_dump(exclude={"latitude", "longitude", "coordinate_source", "accuracy_m", "coordinate_consent"}),
         id=str(uuid.uuid4()),
         timestamp=datetime.now(timezone.utc).isoformat(),
         status="PENDING",
@@ -202,13 +202,13 @@ def create_report(payload: ReportIn, request: Request):
                     (key_hash, payload_hash, record.id),
                 )
 
-            if record.latitude is not None:
+            if payload.latitude is not None:
                 db.execute(
                     """INSERT INTO report_coordinates
                     (report_id,latitude,longitude,source,accuracy_m,consent_at)
                     VALUES (?,?,?,?,?,?)""",
-                    (record.id, record.latitude, record.longitude,
-                     record.coordinate_source, record.accuracy_m,
+                    (record.id, payload.latitude, payload.longitude,
+                     payload.coordinate_source, payload.accuracy_m,
                      datetime.now(timezone.utc).isoformat()),
                 )
 
