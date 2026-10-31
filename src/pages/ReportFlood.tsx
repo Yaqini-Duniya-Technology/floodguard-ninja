@@ -295,7 +295,7 @@ export default function ReportFlood() {
                         </div>
                       </div>
 
-                      <Button type="submit" className="w-full h-14 text-lg bg-primary hover:bg-primary/90 rounded-2xl" disabled={isSubmitting || !manualCoordinateValid}>
+                      <Button type="submit" className="w-full h-14 text-lg bg-primary hover:bg-primary/90 rounded-2xl" disabled={isSubmitting || postcodeBusy || gpsBusy || !manualCoordinateValid}>
                         {isSubmitting ? (
                           <div className="flex items-center gap-2">
                             <Waves className="h-5 w-5 animate-bounce" />
