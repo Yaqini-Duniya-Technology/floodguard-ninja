@@ -19,10 +19,11 @@ export async function checkReportStatus(id: string, token: string): Promise<{id:
   return response.json();
 }
 
-export async function submitFloodReport(data: Omit<FloodReport, "id" | "timestamp" | "status"> & { postcode?: string }): Promise<ReportReceipt> {
+export async function submitFloodReport(data: Omit<FloodReport, "id" | "timestamp" | "status"> & { postcode?: string } & Partial<ReportCoordinates>): Promise<ReportReceipt> {
   if (!apiBase) throw new Error("Central reporting is not configured. Please try again when the service is available.");
   // Photos require a separate, secure upload workflow. Never send base64 images to the JSON endpoint.
   const { image: _image, ...report } = data;
+  if (report.latitude !== undefined && report.coordinate_consent !== true) throw new Error("Location consent is required.");
   const response = await fetch(`${apiBase}/api/v1/reports`, {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(report),
   });
