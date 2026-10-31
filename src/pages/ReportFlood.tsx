@@ -222,7 +222,7 @@ export default function ReportFlood() {
                           <Input aria-label="Manual latitude" placeholder="Latitude (-90 to 90)" inputMode="decimal" value={manualCoords.latitude} onChange={e=>setManualCoords(p=>({...p,latitude:e.target.value}))}/>
                           <Input aria-label="Manual longitude" placeholder="Longitude (-180 to 180)" inputMode="decimal" value={manualCoords.longitude} onChange={e=>setManualCoords(p=>({...p,longitude:e.target.value}))}/>
                         </div>
-                        <p className="text-xs text-muted-foreground">Manual coordinates are optional and local-only until a secure backend workflow is enabled. They are not saved with your report. For now, include the important location details in the Specific Location field.</p>
+                        <p className="text-xs text-muted-foreground">Manual coordinates and GPS selections are currently local-only and are not saved with your report. For now, include important details in the Specific Location field.</p>
                         {!manualCoordinateValid && <p role="alert" className="text-xs text-red-700">Enter both coordinates within valid ranges or leave both blank.</p>}
                         {gpsLocation && <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={useGpsCoordinates} onChange={e=>setUseGpsCoordinates(e.target.checked)}/> Use captured GPS as my preferred coordinates (not yet submitted)</label>}
                         {gpsLocation && <Button type="button" variant="ghost" onClick={() => { gpsRequestRef.current++; setGpsBusy(false); setGpsLocation(null); setUseGpsCoordinates(false); setGpsMessage("Captured coordinates discarded."); }}>Discard coordinates</Button>}
