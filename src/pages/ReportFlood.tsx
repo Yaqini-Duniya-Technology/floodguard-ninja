@@ -222,7 +222,8 @@ export default function ReportFlood() {
                         </div>
                         <p className="text-xs text-muted-foreground">Manual coordinates are optional and local-only until a secure backend workflow is enabled. They are not saved with your report. For now, include the important location details in the Specific Location field.</p>
                         {!manualCoordinateValid && <p role="alert" className="text-xs text-red-700">Enter both coordinates within valid ranges or leave both blank.</p>}
-                        {gpsLocation && <Button type="button" variant="ghost" onClick={() => { gpsRequestRef.current++; setGpsBusy(false); setGpsLocation(null); setGpsMessage("Captured coordinates discarded."); }}>Discard coordinates</Button>}
+                        {gpsLocation && <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={useGpsCoordinates} onChange={e=>setUseGpsCoordinates(e.target.checked)}/> Use captured GPS as my preferred coordinates (not yet submitted)</label>}
+                        {gpsLocation && <Button type="button" variant="ghost" onClick={() => { gpsRequestRef.current++; setGpsBusy(false); setGpsLocation(null); setUseGpsCoordinates(false); setGpsMessage("Captured coordinates discarded."); }}>Discard coordinates</Button>}
                         {gpsLocation && <p className="text-xs">Latitude {gpsLocation.latitude.toFixed(5)}, longitude {gpsLocation.longitude.toFixed(5)}; estimated accuracy ±{Math.round(gpsLocation.accuracy)} m. GPS is not NIPOST verification.</p>}
                       </div>
                       <div className="space-y-2">
