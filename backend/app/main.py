@@ -85,6 +85,14 @@ class ReportIn(BaseModel):
     accuracy_m: float | None = Field(default=None, ge=0, le=100000)
     coordinate_consent: bool = False
 
+    @field_validator("latitude", "longitude", "accuracy_m", mode="before")
+    @classmethod
+    def reject_boolean_coordinates(cls, value):
+        # bool subclasses int in Python; reject it before float coercion.
+        if isinstance(value, bool):
+            raise ValueError("Coordinate values must be numbers, not booleans")
+        return value
+
     @model_validator(mode="after")
     def check_coordinates(self):
         fields = (self.latitude, self.longitude, self.coordinate_source)
