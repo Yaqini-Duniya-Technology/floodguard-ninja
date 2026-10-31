@@ -67,7 +67,7 @@ export default function ReportFlood() {
           setGpsMessage("Location reading was invalid. Enter a location manually."); setGpsBusy(false); return;
         }
         setGpsLocation({latitude, longitude, accuracy});
-        setGpsMessage("Coordinates captured. Confirm the reported location before submitting.");
+        setGpsMessage(accuracy > 1000 ? "GPS accuracy is low (over 1 km). Confirm the location manually." : "Coordinates captured. Confirm the reported location before submitting.");
         setGpsBusy(false);
       },
       () => { if (requestId !== gpsRequestRef.current) return; setGpsMessage("Location was not available or permission was denied. Enter a location manually."); setGpsBusy(false); },
