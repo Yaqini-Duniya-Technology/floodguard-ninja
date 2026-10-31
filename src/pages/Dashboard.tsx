@@ -193,11 +193,11 @@ export default function Dashboard() {
           <div className="bg-white/5 p-4 rounded-2xl">
             <div className="flex items-center justify-between mb-2">
               <p className="text-[10px] text-white/40 uppercase font-bold tracking-widest">System Engine</p>
-              <Badge variant="outline" className="text-[8px] border-white/20 text-white/60">v2.4.0</Badge>
+              <Badge variant="outline" className="text-[8px] border-white/20 text-white/60">v2.6.0</Badge>
             </div>
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
-              <span className="text-xs font-bold text-green-500 uppercase tracking-tighter">AI Core Online</span>
+              <span className="text-xs font-bold text-green-500 uppercase tracking-tighter">Prediction model not validated</span>
             </div>
           </div>
         </div>
@@ -218,7 +218,7 @@ export default function Dashboard() {
           <div className="hidden md:flex items-center gap-6">
             <div className="text-right">
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Global Status</p>
-              <p className="text-sm font-black text-red-600 uppercase">Extreme Watch Level</p>
+              <p className="text-sm font-black text-red-600 uppercase">Live risk level unverified</p>
             </div>
             <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-black">
               78
@@ -237,35 +237,35 @@ export default function Dashboard() {
               />
               <div className="absolute inset-0 bg-gradient-to-r from-[#003566]/90 to-transparent flex flex-col justify-center px-10">
                 <h2 className="text-4xl font-black text-white tracking-tighter uppercase mb-2">Predict. Prepare. Protect.</h2>
-                <p className="text-orange-400 font-bold tracking-widest text-xs uppercase mb-6">National Disaster Management Command Center</p>
+                <p className="text-orange-400 font-bold tracking-widest text-xs uppercase mb-6">FloodGuard demonstration dashboard — not an official command center</p>
                 
                 <Dialog open={isEmergencyModalOpen} onOpenChange={setIsEmergencyModalOpen}>
                   <DialogTrigger asChild>
                     <Button 
                       className="bg-red-600 hover:bg-red-700 text-white font-black uppercase tracking-widest text-xs w-fit h-12 px-8 rounded-xl shadow-2xl shadow-red-600/40 border-b-4 border-red-800 active:border-b-0 active:translate-y-1 transition-all"
                     >
-                      Declare National Emergency
+                      Emergency Dispatch Unavailable
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[500px] rounded-[2.5rem] p-0 overflow-hidden border-none shadow-2xl">
                     <div className="bg-red-600 p-8 text-white relative">
                       <div className="absolute top-0 right-0 p-8 opacity-20"><ShieldAlert className="h-24 w-24" /></div>
                       <DialogTitle className="text-3xl font-black uppercase tracking-tighter mb-2">Emergency Declaration</DialogTitle>
-                      <DialogDescription className="text-white/80 font-medium">This action will trigger immediate national emergency protocols.</DialogDescription>
+                      <DialogDescription className="text-white/80 font-medium">FloodGuard is not connected to emergency responders or government command centers.</DialogDescription>
                     </div>
                     <div className="p-8 space-y-6 bg-white">
                       <p className="text-sm text-[#003566] font-medium leading-relaxed">
-                        Declaring a National Emergency will activate all state rescue teams, release strategic reserves, and initiate mandatory evacuations in red-zones.
+                        This is a demonstration interface only. For immediate danger in Nigeria, call 112.
                       </p>
                       <div className="bg-red-50 border border-red-100 p-4 rounded-2xl flex items-start gap-4">
                         <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
                         <p className="text-[10px] font-bold text-red-600 uppercase tracking-widest leading-relaxed">
-                          This protocol cannot be undone once broadcasted to state command centers.
+                          No emergency notification or broadcast can be initiated here.
                         </p>
                       </div>
                       <DialogFooter className="flex flex-col sm:flex-row gap-3 pt-4">
                         <Button variant="outline" onClick={() => setIsEmergencyModalOpen(false)} className="rounded-xl h-12 font-black uppercase tracking-widest text-xs border-2 border-[#003566] text-[#003566]">Cancel</Button>
-                        <Button className="bg-red-600 hover:bg-red-700 text-white rounded-xl h-12 font-black uppercase tracking-widest text-xs flex-1">Confirm Activation</Button>
+                        <Button disabled className="bg-red-600 text-white rounded-xl h-12 font-black uppercase tracking-widest text-xs flex-1">Dispatch Not Connected</Button>
                       </DialogFooter>
                     </div>
                   </DialogContent>
