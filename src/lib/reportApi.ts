@@ -30,7 +30,7 @@ export async function submitFloodReport(data: Omit<FloodReport, "id" | "timestam
   if (report.latitude !== undefined && (!Number.isFinite(report.latitude) || !Number.isFinite(report.longitude) || Math.abs(report.latitude) > 90 || Math.abs(report.longitude!) > 180)) throw new Error("Invalid coordinates.");
   if (report.accuracy_m !== undefined && (report.coordinate_source !== "gps" || !Number.isFinite(report.accuracy_m) || report.accuracy_m < 0 || report.accuracy_m > 100000)) throw new Error("Invalid GPS accuracy.");
   const response = await fetch(`${apiBase}/api/v1/reports`, {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(report),
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(report), cache: "no-store",
   });
   if (!response.ok) {
     if (response.status === 429) throw new Error("Too many reports submitted. Please wait before trying again.");
