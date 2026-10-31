@@ -193,6 +193,12 @@ export default function ReportFlood() {
                       </div>
 
                       <div className="space-y-2">
+                        <Label>Optional GPS coordinates</Label>
+                        <Button type="button" variant="outline" disabled={gpsBusy} onClick={captureGps}>{gpsBusy ? "Locating..." : "Use my current location"}</Button>
+                        <p role="status" className="text-xs text-muted-foreground">{gpsMessage || "Location permission is optional. Coordinates are not transmitted until explicitly included in a future supported report workflow."}</p>
+                        {gpsLocation && <p className="text-xs">Latitude {gpsLocation.latitude.toFixed(5)}, longitude {gpsLocation.longitude.toFixed(5)}; estimated accuracy ±{Math.round(gpsLocation.accuracy)} m. GPS is not NIPOST verification.</p>}
+                      </div>
+                      <div className="space-y-2">
                         <Label>Specific Location</Label>
                         <div className="relative">
                           <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
