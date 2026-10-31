@@ -2,6 +2,14 @@ import type { FloodReport } from "@/lib/storage";
 
 export const apiBase = import.meta.env.VITE_FLOODGUARD_API_URL?.replace(/\/$/, "");
 
+export type ReportCoordinates = {
+  latitude: number;
+  longitude: number;
+  coordinate_source: "gps" | "manual";
+  accuracy_m?: number;
+  coordinate_consent: true;
+};
+
 export type ReportReceipt = FloodReport & { receipt_token: string };
 
 export async function checkReportStatus(id: string, token: string): Promise<{id: string; status: string; submitted_at: string; dispatch: string}> {
