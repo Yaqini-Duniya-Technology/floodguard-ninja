@@ -87,6 +87,7 @@ export default function ReportFlood() {
       setPostcodeVerified(false);
       setGpsLocation(null);
       setGpsMessage("");
+      setManualCoords({latitude:"",longitude:""});
       setIsSuccess(true);
       toast.success("Report received by FloodGuard. It is pending review; emergency services were not notified.");
     } catch (error) {
@@ -148,7 +149,7 @@ export default function ReportFlood() {
                   Thank you for contributing to community safety. Your report is pending review. Emergency responders have not been automatically notified.
                 </p>
                 {receiptId && <div className="mb-5 text-sm break-all space-y-2 text-left bg-muted p-4 rounded-lg"><p>Report reference: <strong>{receiptId}</strong></p><p>Private receipt token: <strong>{receiptToken}</strong></p><p>Save both values securely to check your report status. The token is displayed only now. This is not emergency dispatch.</p><Button type="button" variant="secondary" onClick={() => { navigator.clipboard?.writeText(`Reference: ${receiptId}\nReceipt token: ${receiptToken}`).then(() => toast.success("Receipt copied")).catch(() => toast.error("Copy unavailable; save both values manually")); }}>Copy receipt</Button></div>}
-                <Button onClick={() => { setIsSuccess(false); setReceiptId(""); setReceiptToken(""); setFilePreview(null); }} variant="outline" size="lg">Submit Another Report</Button>
+                <Button onClick={() => { setIsSuccess(false); setReceiptId(""); setReceiptToken(""); setFilePreview(null); setManualCoords({latitude:"",longitude:""}); setGpsLocation(null); }} variant="outline" size="lg">Submit Another Report</Button>
               </motion.div>
             ) : (
               <motion.div
