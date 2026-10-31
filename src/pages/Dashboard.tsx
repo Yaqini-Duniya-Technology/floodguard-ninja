@@ -47,7 +47,7 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { storage, FloodReport } from "@/lib/storage";
+import type { FloodReport } from "@/lib/storage";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
 import { Chatbot } from "@/components/ai/Chatbot";
@@ -85,8 +85,9 @@ export default function Dashboard() {
   const [isEmergencyModalOpen, setIsEmergencyModalOpen] = React.useState(false);
 
   React.useEffect(() => {
-    const loadedReports = storage.getReports();
-    setReports(loadedReports);
+    // Private production reports are intentionally not exposed to public dashboards.
+    // Local browser reports are not authoritative production records.
+    setReports([]);
   }, []);
 
   const sidebarItems = [
@@ -912,7 +913,7 @@ function ReportsTab({ reports }: { reports: FloodReport[] }) {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
         <div>
           <h2 className="text-3xl font-black text-[#003566] tracking-tighter uppercase mb-1">Ground Intelligence</h2>
-          <p className="text-muted-foreground">Citizen-verified reports from affected communities.</p>
+          <p className="text-muted-foreground">Public report listings are unavailable pending authenticated, audited access.</p>
         </div>
         <Button className="h-12 px-6 bg-[#003566] text-white font-black uppercase tracking-widest rounded-xl gap-2">
           <PlusCircle className="h-5 w-5" />
@@ -924,7 +925,7 @@ function ReportsTab({ reports }: { reports: FloodReport[] }) {
         {reports.length === 0 ? (
           <div className="col-span-full py-24 text-center bg-white/50 rounded-[2.5rem] border-4 border-dashed border-white">
             <MessageSquare className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-muted-foreground font-bold">No verified ground reports in this window.</p>
+            <p className="text-muted-foreground font-bold">Production reports are private. Public listing is not enabled.</p>
           </div>
         ) : (
           reports.map((report) => (
