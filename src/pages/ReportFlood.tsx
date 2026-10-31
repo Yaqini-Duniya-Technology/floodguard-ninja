@@ -21,6 +21,7 @@ export default function ReportFlood() {
   const [gpsMessage, setGpsMessage] = React.useState("");
   const [gpsLocation, setGpsLocation] = React.useState<{latitude:number;longitude:number;accuracy:number}|null>(null);
   const [manualCoords, setManualCoords] = React.useState({latitude:"",longitude:""});
+  const [useGpsCoordinates, setUseGpsCoordinates] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
   const [receiptId, setReceiptId] = React.useState("");
   const [receiptToken, setReceiptToken] = React.useState("");
@@ -64,6 +65,7 @@ export default function ReportFlood() {
           setGpsMessage("Location reading was invalid. Enter a location manually."); setGpsBusy(false); return;
         }
         setGpsLocation({latitude, longitude, accuracy});
+        setUseGpsCoordinates(false);
         setGpsMessage(accuracy > 1000 ? "GPS accuracy is low (over 1 km). Confirm the location manually." : "Coordinates captured. Confirm the reported location before submitting.");
         setGpsBusy(false);
       },
