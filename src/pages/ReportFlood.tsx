@@ -47,7 +47,7 @@ export default function ReportFlood() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.type || !formData.severity || !formData.location) {
+    if (!formData.type || !formData.severity || !formData.location.trim() || !formData.description.trim()) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -113,7 +113,7 @@ export default function ReportFlood() {
                   Thank you for contributing to community safety. Your report is pending review. Emergency responders have not been automatically notified.
                 </p>
                 {receiptId && <div className="mb-5 text-sm break-all space-y-2 text-left bg-muted p-4 rounded-lg"><p>Report reference: <strong>{receiptId}</strong></p><p>Private receipt token: <strong>{receiptToken}</strong></p><p>Save both values securely to check your report status. The token is displayed only now. This is not emergency dispatch.</p><Button type="button" variant="secondary" onClick={() => { navigator.clipboard?.writeText(`Reference: ${receiptId}\nReceipt token: ${receiptToken}`).then(() => toast.success("Receipt copied")).catch(() => toast.error("Copy unavailable; save both values manually")); }}>Copy receipt</Button></div>}
-                <Button onClick={() => { setIsSuccess(false); setFilePreview(null); }} variant="outline" size="lg">Submit Another Report</Button>
+                <Button onClick={() => { setIsSuccess(false); setReceiptId(""); setReceiptToken(""); setFilePreview(null); }} variant="outline" size="lg">Submit Another Report</Button>
               </motion.div>
             ) : (
               <motion.div
@@ -177,6 +177,8 @@ export default function ReportFlood() {
                             placeholder="e.g. Near the old bridge, Ganaja Road" 
                             className="pl-9" 
                             required 
+                            maxLength={240}
+                            minLength={2}
                             value={formData.location}
                             onChange={(e) => updateField("location", e.target.value)}
                           />
@@ -189,6 +191,7 @@ export default function ReportFlood() {
                         <Textarea 
                           placeholder="Tell us what you see... (e.g. The water has risen by 2 feet in the last hour)" 
                           className="min-h-[120px]"
+                          maxLength={3000}
                           required
                           value={formData.description}
                           onChange={(e) => updateField("description", e.target.value)}
