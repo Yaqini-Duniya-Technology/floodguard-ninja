@@ -200,6 +200,11 @@ export default function ReportFlood() {
                         <Label>Optional GPS coordinates</Label>
                         <Button type="button" variant="outline" disabled={gpsBusy} onClick={captureGps}>{gpsBusy ? "Locating..." : "Use my current location"}</Button>
                         <p role="status" className="text-xs text-muted-foreground">{gpsMessage || "Location permission is optional. Coordinates are not transmitted until explicitly included in a future supported report workflow."}</p>
+                        <div className="grid grid-cols-2 gap-3">
+                          <Input aria-label="Manual latitude" placeholder="Latitude (-90 to 90)" inputMode="decimal" value={manualCoords.latitude} onChange={e=>setManualCoords(p=>({...p,latitude:e.target.value}))}/>
+                          <Input aria-label="Manual longitude" placeholder="Longitude (-180 to 180)" inputMode="decimal" value={manualCoords.longitude} onChange={e=>setManualCoords(p=>({...p,longitude:e.target.value}))}/>
+                        </div>
+                        <p className="text-xs text-muted-foreground">Manual coordinates are optional and local-only until a secure backend workflow is enabled.</p>
                         {gpsLocation && <Button type="button" variant="ghost" onClick={() => { setGpsLocation(null); setGpsMessage("Captured coordinates discarded."); }}>Discard coordinates</Button>}
                         {gpsLocation && <p className="text-xs">Latitude {gpsLocation.latitude.toFixed(5)}, longitude {gpsLocation.longitude.toFixed(5)}; estimated accuracy ±{Math.round(gpsLocation.accuracy)} m. GPS is not NIPOST verification.</p>}
                       </div>
