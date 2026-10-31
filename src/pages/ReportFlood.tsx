@@ -22,7 +22,6 @@ export default function ReportFlood() {
   const [gpsMessage, setGpsMessage] = React.useState("");
   const [gpsLocation, setGpsLocation] = React.useState<{latitude:number;longitude:number;accuracy:number}|null>(null);
   const [manualCoords, setManualCoords] = React.useState({latitude:"",longitude:""});
-  const [gpsRequestId, setGpsRequestId] = React.useState(0);
   const [isSuccess, setIsSuccess] = React.useState(false);
   const [receiptId, setReceiptId] = React.useState("");
   const [receiptToken, setReceiptToken] = React.useState("");
@@ -56,6 +55,7 @@ export default function ReportFlood() {
   const gpsRequestRef = React.useRef(0);
   const captureGps = () => {
     const requestId = ++gpsRequestRef.current;
+    if (!window.isSecureContext) { setGpsMessage("GPS requires HTTPS. Enter a location manually."); return; }
     if (!navigator.geolocation) { setGpsMessage("GPS is unavailable in this browser. Enter a location manually."); return; }
     setGpsBusy(true);
     setGpsMessage("Requesting location permission...");
