@@ -82,12 +82,15 @@ class ReportIn(BaseModel):
     longitude: float | None = Field(default=None, ge=-180, le=180)
     coordinate_source: str | None = Field(default=None, pattern="^(gps|manual)$")
     accuracy_m: float | None = Field(default=None, ge=0, le=100000)
+    coordinate_consent: bool = False
 
     @model_validator(mode="after")
     def check_coordinates(self):
         fields = (self.latitude, self.longitude, self.coordinate_source)
         if any(x is not None for x in fields) and not all(x is not None for x in fields):
             raise ValueError("Coordinates require latitude, longitude and source")
+        if self.latitude is not None and not self.coordinate_consent:
+            raise ValueError("Explicit coordinate consent is required")
         if self.accuracy_m is not None and self.coordinate_source != "gps":
             raise ValueError("Accuracy requires GPS source")
         return self
