@@ -74,6 +74,7 @@ export default function ReportFlood() {
       toast.error("Please fill in all required fields");
       return;
     }
+    if (!manualCoordinateValid) { toast.error("Enter valid latitude and longitude, or leave both blank."); return; }
     setIsSubmitting(true);
     try {
       // GPS coordinates are intentionally not transmitted: backend coordinate persistence and consent audit are not deployed.
@@ -105,6 +106,13 @@ export default function ReportFlood() {
       reader.readAsDataURL(file);
     }
   };
+
+  const manualCoordinateValid = (!manualCoords.latitude && !manualCoords.longitude) || (
+    manualCoords.latitude.trim() !== "" && manualCoords.longitude.trim() !== "" &&
+    Number.isFinite(Number(manualCoords.latitude)) && Number.isFinite(Number(manualCoords.longitude)) &&
+    Number(manualCoords.latitude) >= -90 && Number(manualCoords.latitude) <= 90 &&
+    Number(manualCoords.longitude) >= -180 && Number(manualCoords.longitude) <= 180
+  );
 
   const updateField = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
