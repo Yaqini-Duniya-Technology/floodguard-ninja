@@ -14,7 +14,7 @@ from threading import Lock
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from .postcode import router as postcode_router
 from .geospatial import router as geospatial_router
 from .intelligence import router as intelligence_router
@@ -77,6 +77,20 @@ class ReportIn(BaseModel):
     location: str = Field(min_length=2, max_length=240)
     description: str = Field(default="", max_length=3000)
     postcode: str | None = Field(default=None, max_length=40, description="User-supplied postcode; never implies official NIPOST verification.")
+
+    latitude: float | None = Field(default=None, ge=-90, le=90)
+    longitude: float | None = Field(default=None, ge=-180, le=180)
+    coordinate_source: str | None = Field(default=None, pattern="^(gps|manual)$")
+    accuracy_m: float | None = Field(default=None, ge=0, le=100000)
+
+    @model_validator(mode="after")
+    def check_coordinates(self):
+        fields = (self.latitude, self.longitude, self.coordinate_source)
+        if any(x is not None for x in fields) and not all(x is not None for x in fields):
+            raise ValueError("Coordinates require latitude, longitude and source")
+        if self.accuracy_m is not None and self.coordinate_source != "gps":
+            raise ValueError("Accuracy requires GPS source")
+        return self
 
     @field_validator("type", "severity", "location", "description")
     @classmethod
