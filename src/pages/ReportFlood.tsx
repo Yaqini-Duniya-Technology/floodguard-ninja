@@ -53,18 +53,21 @@ export default function ReportFlood() {
     }
   };
 
+  const gpsRequestRef = React.useRef(0);
   const captureGps = () => {
+    const requestId = ++gpsRequestRef.current;
     if (!navigator.geolocation) { setGpsMessage("GPS is unavailable in this browser. Enter a location manually."); return; }
     setGpsBusy(true);
     setGpsMessage("Requesting location permission...");
     navigator.geolocation.getCurrentPosition(
       position => {
+        if (requestId !== gpsRequestRef.current) return;
         const {latitude, longitude, accuracy} = position.coords;
         setGpsLocation({latitude, longitude, accuracy});
         setGpsMessage("Coordinates captured. Confirm the reported location before submitting.");
         setGpsBusy(false);
       },
-      () => { setGpsMessage("Location was not available or permission was denied. Enter a location manually."); setGpsBusy(false); },
+      () => { if (requestId !== gpsRequestRef.current) return; setGpsMessage("Location was not available or permission was denied. Enter a location manually."); setGpsBusy(false); },
       {enableHighAccuracy: true, timeout: 12000, maximumAge: 0}
     );
   };
@@ -216,7 +219,7 @@ export default function ReportFlood() {
                         </div>
                         <p className="text-xs text-muted-foreground">Manual coordinates are optional and local-only until a secure backend workflow is enabled. They are not saved with your report.</p>
                         {!manualCoordinateValid && <p role="alert" className="text-xs text-red-700">Enter both coordinates within valid ranges or leave both blank.</p>}
-                        {gpsLocation && <Button type="button" variant="ghost" onClick={() => { setGpsLocation(null); setGpsMessage("Captured coordinates discarded."); }}>Discard coordinates</Button>}
+                        {gpsLocation && <Button type="button" variant="ghost" onClick={() => { gpsRequestRef.current++; setGpsBusy(false); setGpsLocation(null); setGpsMessage("Captured coordinates discarded."); }}>Discard coordinates</Button>}
                         {gpsLocation && <p className="text-xs">Latitude {gpsLocation.latitude.toFixed(5)}, longitude {gpsLocation.longitude.toFixed(5)}; estimated accuracy ±{Math.round(gpsLocation.accuracy)} m. GPS is not NIPOST verification.</p>}
                       </div>
                       <div className="space-y-2">
