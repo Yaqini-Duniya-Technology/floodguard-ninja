@@ -99,6 +99,7 @@ export default function ReportFlood() {
       setFormData({ type: "", severity: "", location: "", description: "" });
       setFilePreview(null);
       setPostcode("");
+      setPostcodeMessage("");
       gpsRequestRef.current++;
       setGpsLocation(null);
       setUseGpsCoordinates(false);
