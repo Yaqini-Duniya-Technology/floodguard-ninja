@@ -6,6 +6,7 @@ import uuid
 import re
 import secrets
 import hashlib
+import math
 from contextlib import contextmanager
 from datetime import datetime, timezone
 import time
@@ -93,6 +94,8 @@ class ReportIn(BaseModel):
             raise ValueError("Explicit coordinate consent is required")
         if self.coordinate_consent and self.latitude is None:
             raise ValueError("Coordinate consent requires selected coordinates")
+        if any(v is not None and not math.isfinite(v) for v in (self.latitude, self.longitude, self.accuracy_m)):
+            raise ValueError("Coordinates and accuracy must be finite")
         if self.accuracy_m is not None and self.coordinate_source != "gps":
             raise ValueError("Accuracy requires GPS source")
         return self
