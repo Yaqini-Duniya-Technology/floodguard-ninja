@@ -83,6 +83,7 @@ export default function ReportFlood() {
     }
     if (postcodeBusy || gpsBusy) { toast.error("Wait for the current location check to finish."); return; }
     if (useManualCoordinates && (!manualCoords.latitude.trim() || !manualCoords.longitude.trim())) { toast.error("Enter both coordinates before selecting manual location."); return; }
+    if (useGpsCoordinates && useManualCoordinates) { toast.error("Choose either GPS or manual coordinates."); return; }
     if (useGpsCoordinates && !gpsLocation) { toast.error("Capture a GPS location first."); return; }
     if (!manualCoordinateValid) { toast.error("Enter valid latitude and longitude, or leave both blank."); return; }
     setIsSubmitting(true);
