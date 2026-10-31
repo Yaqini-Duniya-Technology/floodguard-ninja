@@ -92,6 +92,16 @@ def initialize_schema(connection):
         )
         """,
         """
+        CREATE TABLE IF NOT EXISTS report_coordinates (
+            report_id TEXT PRIMARY KEY REFERENCES reports(id),
+            latitude REAL NOT NULL CHECK(latitude BETWEEN -90 AND 90),
+            longitude REAL NOT NULL CHECK(longitude BETWEEN -180 AND 180),
+            source TEXT NOT NULL CHECK(source IN ('gps','manual')),
+            accuracy_m REAL CHECK(accuracy_m >= 0),
+            consent_at TEXT NOT NULL
+        )
+        """,
+        """
         CREATE TABLE IF NOT EXISTS report_postcodes (
             report_id TEXT PRIMARY KEY,
             postcode TEXT,
