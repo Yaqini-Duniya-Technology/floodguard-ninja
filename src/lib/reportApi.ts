@@ -25,6 +25,8 @@ export async function submitFloodReport(data: Omit<FloodReport, "id" | "timestam
   const { image: _image, ...report } = data;
   if (report.latitude !== undefined && report.coordinate_consent !== true) throw new Error("Location consent is required.");
   if ((report.latitude === undefined) !== (report.longitude === undefined)) throw new Error("Both latitude and longitude are required.");
+  if (report.latitude !== undefined && !["gps", "manual"].includes(report.coordinate_source || "")) throw new Error("Coordinate source is required.");
+  if (report.coordinate_consent && report.latitude === undefined) throw new Error("Select coordinates before granting location consent.");
   if (report.latitude !== undefined && (!Number.isFinite(report.latitude) || !Number.isFinite(report.longitude) || Math.abs(report.latitude) > 90 || Math.abs(report.longitude!) > 180)) throw new Error("Invalid coordinates.");
   const response = await fetch(`${apiBase}/api/v1/reports`, {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(report),
