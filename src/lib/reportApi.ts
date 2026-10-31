@@ -18,6 +18,10 @@ export async function submitFloodReport(data: Omit<FloodReport, "id" | "timestam
   const response = await fetch(`${apiBase}/api/v1/reports`, {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(report),
   });
-  if (!response.ok) throw new Error("Report could not be received by the server. Please retry.");
+  if (!response.ok) {
+    if (response.status === 429) throw new Error("Too many reports submitted. Please wait before trying again.");
+    if (response.status === 422) throw new Error("Some report details are invalid. Please review the form.");
+    throw new Error("Report could not be received by the server. Please retry.");
+  }
   return response.json();
 }
