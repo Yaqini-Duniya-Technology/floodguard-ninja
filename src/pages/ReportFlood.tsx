@@ -213,7 +213,8 @@ export default function ReportFlood() {
                           <Input aria-label="Manual latitude" placeholder="Latitude (-90 to 90)" inputMode="decimal" value={manualCoords.latitude} onChange={e=>setManualCoords(p=>({...p,latitude:e.target.value}))}/>
                           <Input aria-label="Manual longitude" placeholder="Longitude (-180 to 180)" inputMode="decimal" value={manualCoords.longitude} onChange={e=>setManualCoords(p=>({...p,longitude:e.target.value}))}/>
                         </div>
-                        <p className="text-xs text-muted-foreground">Manual coordinates are optional and local-only until a secure backend workflow is enabled.</p>
+                        <p className="text-xs text-muted-foreground">Manual coordinates are optional and local-only until a secure backend workflow is enabled. They are not saved with your report.</p>
+                        {!manualCoordinateValid && <p role="alert" className="text-xs text-red-700">Enter both coordinates within valid ranges or leave both blank.</p>}
                         {gpsLocation && <Button type="button" variant="ghost" onClick={() => { setGpsLocation(null); setGpsMessage("Captured coordinates discarded."); }}>Discard coordinates</Button>}
                         {gpsLocation && <p className="text-xs">Latitude {gpsLocation.latitude.toFixed(5)}, longitude {gpsLocation.longitude.toFixed(5)}; estimated accuracy ±{Math.round(gpsLocation.accuracy)} m. GPS is not NIPOST verification.</p>}
                       </div>
@@ -285,7 +286,7 @@ export default function ReportFlood() {
                         </div>
                       </div>
 
-                      <Button type="submit" className="w-full h-14 text-lg bg-primary hover:bg-primary/90 rounded-2xl" disabled={isSubmitting}>
+                      <Button type="submit" className="w-full h-14 text-lg bg-primary hover:bg-primary/90 rounded-2xl" disabled={isSubmitting || !manualCoordinateValid}>
                         {isSubmitting ? (
                           <div className="flex items-center gap-2">
                             <Waves className="h-5 w-5 animate-bounce" />
