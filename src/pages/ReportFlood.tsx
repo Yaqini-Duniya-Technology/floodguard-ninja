@@ -81,6 +81,7 @@ export default function ReportFlood() {
       return;
     }
     if (postcodeBusy || gpsBusy) { toast.error("Wait for the current location check to finish."); return; }
+    if (useGpsCoordinates && !gpsLocation) { toast.error("Capture a GPS location first."); return; }
     if (!manualCoordinateValid) { toast.error("Enter valid latitude and longitude, or leave both blank."); return; }
     setIsSubmitting(true);
     try {
