@@ -86,8 +86,12 @@ export default function ReportFlood() {
     if (!manualCoordinateValid) { toast.error("Enter valid latitude and longitude, or leave both blank."); return; }
     setIsSubmitting(true);
     try {
-      // GPS coordinates are intentionally not transmitted: backend coordinate persistence and consent audit are not deployed.
-      const receipt = await submitFloodReport({ ...formData, postcode: postcode.trim() || undefined });
+      const coordinates = useGpsCoordinates && gpsLocation
+        ? {latitude:gpsLocation.latitude, longitude:gpsLocation.longitude, accuracy_m:gpsLocation.accuracy, coordinate_source:"gps" as const, coordinate_consent:true as const}
+        : useManualCoordinates && manualCoords.latitude.trim() && manualCoords.longitude.trim()
+          ? {latitude:Number(manualCoords.latitude), longitude:Number(manualCoords.longitude), coordinate_source:"manual" as const, coordinate_consent:true as const}
+          : {};
+      const receipt = await submitFloodReport({ ...formData, postcode: postcode.trim() || undefined, ...coordinates });
       setReceiptId(receipt.id);
       setReceiptToken(receipt.receipt_token);
       setFormData({ type: "", severity: "", location: "", description: "" });
