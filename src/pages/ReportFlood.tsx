@@ -82,6 +82,8 @@ export default function ReportFlood() {
       setFilePreview(null);
       setPostcode("");
       setPostcodeVerified(false);
+      setGpsLocation(null);
+      setGpsMessage("");
       setIsSuccess(true);
       toast.success("Report received by FloodGuard. It is pending review; emergency services were not notified.");
     } catch (error) {
@@ -196,6 +198,7 @@ export default function ReportFlood() {
                         <Label>Optional GPS coordinates</Label>
                         <Button type="button" variant="outline" disabled={gpsBusy} onClick={captureGps}>{gpsBusy ? "Locating..." : "Use my current location"}</Button>
                         <p role="status" className="text-xs text-muted-foreground">{gpsMessage || "Location permission is optional. Coordinates are not transmitted until explicitly included in a future supported report workflow."}</p>
+                        {gpsLocation && <Button type="button" variant="ghost" onClick={() => { setGpsLocation(null); setGpsMessage("Captured coordinates discarded."); }}>Discard coordinates</Button>}
                         {gpsLocation && <p className="text-xs">Latitude {gpsLocation.latitude.toFixed(5)}, longitude {gpsLocation.longitude.toFixed(5)}; estimated accuracy ±{Math.round(gpsLocation.accuracy)} m. GPS is not NIPOST verification.</p>}
                       </div>
                       <div className="space-y-2">
