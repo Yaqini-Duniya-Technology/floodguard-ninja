@@ -2,7 +2,6 @@
 import os
 import re
 from urllib.parse import urlparse
-import httpx
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field, field_validator
 
@@ -36,7 +35,7 @@ def provider_settings():
     url = os.getenv('NIPOST_LOOKUP_URL', '')
     parsed = urlparse(url)
     allowed_host = os.getenv('NIPOST_ALLOWED_HOST', '').lower()
-    if parsed.scheme != 'https' or not parsed.hostname or not allowed_host or parsed.hostname.lower() != allowed_host or parsed.username or parsed.password or parsed.fragment:
+    if parsed.scheme != 'https' or not parsed.hostname or not allowed_host or parsed.hostname.lower() != allowed_host or parsed.username or parsed.password or parsed.fragment or parsed.port not in (None, 443):
         raise HTTPException(503, 'Verified NIPOST HTTPS endpoint and hostname must be configured.')
     key = os.getenv('NIPOST_API_KEY', '')
     if not key:
