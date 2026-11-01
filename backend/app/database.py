@@ -102,7 +102,7 @@ def initialize_schema(connection):
         )
         """,
         """
-        CREATE TABLE IF NOT EXISTS report_postcodes (
+        CREATE TABLE IF NOT EXISTS receipt_revocation_audit (\n            id TEXT PRIMARY KEY,\n            report_id TEXT NOT NULL REFERENCES reports(id),\n            revoked_at TEXT NOT NULL,\n            reason TEXT NOT NULL\n        )\n        """,\n        """\n        CREATE TABLE IF NOT EXISTS report_postcodes (
             report_id TEXT PRIMARY KEY,
             postcode TEXT,
             verification_status TEXT NOT NULL,
