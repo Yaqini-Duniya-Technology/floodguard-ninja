@@ -71,8 +71,14 @@ def test_revoke_invalidates_receipt_and_audits(local_db):
 def test_audit_failure_rolls_back_receipt_rotation(local_db):
     path, report_id, token = local_db
     with sqlite3.connect(path) as conn:
-        conn.execute("DROP TABLE receipt_revocation_audit")
-    with pytest.raises(sqlite3.OperationalError):
+        conn.execute("""
+            CREATE TRIGGER reject_revocation_audit
+            BEFORE INSERT ON receipt_revocation_audit
+            BEGIN
+                SELECT RAISE(ABORT, 'Simulated audit write failure');
+            END
+        """)
+    with pytest.raises(sqlite3.IntegrityError, match="Simulated audit write failure"):
         revoke(report_id, "Audit unavailable", confirm=True, sqlite_path=path)
     with sqlite3.connect(path) as conn:
         stored = conn.execute(
