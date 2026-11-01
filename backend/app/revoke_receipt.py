@@ -37,12 +37,6 @@ def revoke(report_id: str, reason: str, *, confirm: bool = False, sqlite_path=No
         if cursor.rowcount != 1:
             raise LookupError("Receipt not found; no changes made")
         # Commit and audit in the same transaction.
-        conn.execute("""CREATE TABLE IF NOT EXISTS receipt_revocation_audit (
-            id TEXT PRIMARY KEY,
-            report_id TEXT NOT NULL,
-            revoked_at TEXT NOT NULL,
-            reason TEXT NOT NULL
-        )""")
         audit_id = str(uuid.uuid4())
         at = datetime.now(timezone.utc).isoformat()
         conn.execute(
