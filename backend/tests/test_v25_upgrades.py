@@ -1,8 +1,15 @@
 import os
+import pytest
 from fastapi.testclient import TestClient
 from app import main
 
 client = TestClient(main.app)
+
+@pytest.fixture(autouse=True)
+def isolated_sqlite(monkeypatch):
+    # Ensure local test databases are used even when DATABASE_URL is set.
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.delenv("FLOODGUARD_ENV", raising=False)
 
 def sample(**kwargs):
     return dict(type='FLOOD', severity='HIGH', location=' Lokoja, Kogi ', description='Test only', **kwargs)
@@ -33,8 +40,8 @@ def test_receipt_is_private_and_postcode_unverified(tmp_path, monkeypatch):
     assert ok.status_code == 200
     assert ok.json()['dispatch'] == 'not_connected'
     with main.connection() as db:
-        assert db.execute('SELECT verification_status FROM report_postcodes').fetchone()[0] == 'UNVERIFIED'
-        assert db.execute('SELECT token_hash FROM report_receipts').fetchone()[0] != token
+        assert db.execute('SELECT verification_status FROM report_postcodes').fetchone()['verification_status'] == 'UNVERIFIED'
+        assert db.execute('SELECT token_hash FROM report_receipts').fetchone()['token_hash'] != token
 
 def test_idempotency_rejects_duplicate(tmp_path, monkeypatch):
     monkeypatch.setattr(main, 'DB_PATH', tmp_path / 'fg.db')
@@ -42,7 +49,7 @@ def test_idempotency_rejects_duplicate(tmp_path, monkeypatch):
     assert client.post('/api/v1/reports', json=sample(), headers=headers).status_code == 201
     assert client.post('/api/v1/reports', json=sample(), headers=headers).status_code == 409
     with main.connection() as db:
-        assert db.execute('SELECT COUNT(*) FROM reports').fetchone()[0] == 1
+        assert db.execute('SELECT COUNT(*) FROM reports').fetchone()['COUNT(*)'] == 1
 
 def test_invalid_postcode_does_not_submit(tmp_path, monkeypatch):
     monkeypatch.setattr(main, 'DB_PATH', tmp_path / 'fg.db')
