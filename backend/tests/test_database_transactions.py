@@ -5,8 +5,16 @@ import uuid
 from pathlib import Path
 
 from fastapi.testclient import TestClient
+import pytest
 
 from app import main
+
+
+@pytest.fixture(autouse=True)
+def force_isolated_sqlite(monkeypatch):
+    """Transaction tests must never use a configured production PostgreSQL DB."""
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.delenv("FLOODGUARD_ENV", raising=False)
 
 
 def sample_report():
