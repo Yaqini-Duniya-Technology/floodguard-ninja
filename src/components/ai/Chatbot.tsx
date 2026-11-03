@@ -69,20 +69,14 @@ export function Chatbot() {
       let response = "I can only provide information on flood risks and safety. Please ask a relevant question.";
       const lowerUserMsg = userMsg.toLowerCase();
 
-      if (lowerUserMsg.includes("risk for")) {
-        response = `The flood risk for ${selectedLga}, ${selectedState} is currently low. Please stay tuned for updates.`;
-      } else if (lowerUserMsg.includes("lagos")) {
-        response = "Moderate risk expected in Lagos. Please stay updated with local news and prepare an emergency kit.";
-      } else if (lowerUserMsg.includes("kano")) {
-        response = "Kano is currently considered safe with low flood risk.";
-      } else if (lowerUserMsg.includes("high risk states")) {
-        response = "States with high risk include Kogi, Niger, and parts of the Delta region. Please check specific advisories.";
+      if (lowerUserMsg.includes("risk for") || lowerUserMsg.includes("lagos") || lowerUserMsg.includes("kano") || lowerUserMsg.includes("high risk states")) {
+        response = "Live flood-risk verification is not connected yet. I cannot determine whether this location is safe. Check official NEMA/NIHSA and local emergency advisories before making safety decisions.";
       } else if (lowerUserMsg.includes("what to do")) {
         response = "1. Move to higher ground. 2. Avoid floodwater. 3. Call emergency services like 112 if needed. Stay safe!";
       } else if (lowerUserMsg.includes("my area")) {
         response = "To check your area, please provide a state or local government name.";
       } else if (lowerUserMsg.includes("contacts")) {
-        response = "Key emergency contacts are: NEMA at 122, and your state's SEMA.";
+        response = "For an immediate emergency in Nigeria, try the national emergency line 112. Verify local agency contact details through official sources.";
       }
       setMessages(prev => [...prev, { role: "bot", content: response }]);
     }, 800);
