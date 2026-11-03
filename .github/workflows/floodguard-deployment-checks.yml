@@ -4,36 +4,37 @@ on:
     branches: [main]
   workflow_dispatch:
 jobs:
-  backend:
+  source-gate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check backend presence
-        id: presence
+      - name: Require complete v2.8 source
         run: |
-          if [ -f backend/requirements.txt ] && [ -f backend/app/main.py ]; then
-            echo "present=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::warning::v2.8 backend source not imported yet"
-            echo "present=false" >> "$GITHUB_OUTPUT"
-          fi
+          test -f backend/requirements.txt || { echo "::error::Missing backend/requirements.txt. Import v2.8 source before merging."; exit 1; }
+          test -f backend/app/main.py || { echo "::error::Missing backend/app/main.py. Import v2.8 source before merging."; exit 1; }
+          test -f render.yaml || { echo "::error::Missing render.yaml."; exit 1; }
+          test -f vercel.json || { echo "::error::Missing vercel.json."; exit 1; }
+          test ! -f backend/floodguard.sqlite3 || { echo "::error::Do not commit local SQLite data."; exit 1; }
+  backend:
+    needs: source-gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        if: steps.presence.outputs.present == 'true'
         with:
           python-version: '3.12'
-      - name: Install and test backend
-        if: steps.presence.outputs.present == 'true'
-        run: |
+      - run: |
           python -m pip install -r backend/requirements.txt pytest
           python -m pytest backend/tests
   frontend:
+    needs: source-gate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install and build
-        run: |
+          cache: npm
+      - run: |
           npm ci
           npm run build
