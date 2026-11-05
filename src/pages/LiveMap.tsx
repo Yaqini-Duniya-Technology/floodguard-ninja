@@ -142,7 +142,7 @@ const MAP_LAYERS = {
   STANDARD: { label: "Standard", icon: "Map", url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" },
   SATELLITE: { label: "Satellite View", icon: "Satellite", url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" },
   TOPOGRAPHIC: { label: "Topographic Terrain", icon: "Mountain", url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png" },
-  POPULATION: { label: "Population Density", icon: "BarChart3", url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" },
+  POPULATION: { label: "Base Map (No Population Data)", icon: "BarChart3", url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" },
 };
 
 const EVIDENCE_LOCATIONS = [
@@ -158,7 +158,7 @@ const EVIDENCE_LOCATIONS = [
 
 export default function LiveMap() {
   const apiBase = import.meta.env.VITE_FLOODGUARD_API_URL?.replace(/\/$/, "");
-  const [evidence, setEvidence] = React.useState<{warning:string; observations:Array<{latitude:number;longitude:number;summary:string;source_name:string;source_url:string;observed_at:string}>}|null>(null);
+  const [evidence, setEvidence] = React.useState<{warning:string; stale_observation_count:number; assessed_at:string; observations:Array<{latitude:number;longitude:number;summary:string;source_name:string;source_url:string;observed_at:string}>}|null>(null);
   const [evidenceError, setEvidenceError] = React.useState("");
   const [evidenceLocationIndex, setEvidenceLocationIndex] = React.useState(0);
   const evidenceLocation = EVIDENCE_LOCATIONS[evidenceLocationIndex];
@@ -218,14 +218,17 @@ export default function LiveMap() {
 
           <div role="status" className="rounded-lg border border-amber-400 bg-amber-50 p-3 text-sm text-amber-950">
             <strong>DEMONSTRATION ONLY — NOT LIVE FLOOD WARNINGS</strong>
-            <p>Risk percentages, weather, facilities and evacuation routes shown here are illustrative, not verified emergency information.</p>
+            <p>All risk percentages, population figures, vulnerability overlays, weather, shelters, historical figures and evacuation routes are simulated examples. None are verified emergency information or safe travel guidance.</p>
             <label htmlFor="evidence-location" className="mt-2 block font-semibold">Check sourced evidence near:</label>
             <select id="evidence-location" className="mt-1 w-full rounded border border-amber-600 bg-white p-2 text-slate-900" value={evidenceLocationIndex} onChange={event => setEvidenceLocationIndex(Number(event.target.value))}>
               {EVIDENCE_LOCATIONS.map((place, index) => <option key={place.name} value={index}>{place.name}</option>)}
             </select>
             <p className="mt-2 text-xs">Reference city coordinates only. No validated nationwide coverage or real-time flood warnings are implied.</p>
             <p>{evidenceError || evidence?.warning || "Checking evidence…"}</p>
-            {evidence?.observations.map((obs,i) => <p key={i}>{obs.summary} — <a className="underline" href={obs.source_url} target="_blank" rel="noopener noreferrer">{obs.source_name}</a> ({new Date(obs.observed_at).toLocaleDateString()})</p>)}
+            {evidence && <p className="mt-2 text-xs">Evidence assessed: {new Date(evidence.assessed_at).toLocaleString()} (your local time). Recent evidence window: 72 hours.</p>}
+            {evidence && evidence.stale_observation_count > 0 && <p className="mt-2 font-semibold">Excluded {evidence.stale_observation_count} outdated or future-dated observation(s). Exclusion does not mean this location is safe.</p>}
+            {evidence && evidence.observations.length === 0 && <p className="mt-2 font-semibold">No recent sourced observations returned. Flood risk remains unknown.</p>}
+            {evidence?.observations.map((obs,i) => <div key={i} className="mt-2 rounded border border-amber-500 p-2"><strong>Recent sourced observation (within 72 hours)</strong><p>{obs.summary}</p><p>Observed: {new Date(obs.observed_at).toLocaleString()} (your local time)</p><p>Source: <a className="underline" href={obs.source_url} target="_blank" rel="noopener noreferrer">{obs.source_name}</a></p><p>Observation only — not a flood forecast or official safety clearance.</p></div>)}
           </div>
           {/* Critical Alerts */}
           <div className="space-y-3">
@@ -281,7 +284,7 @@ export default function LiveMap() {
 
           {/* Socio-Economic Vulnerability Overlay Toggle */}
           <div className="space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Map Overlays</h3>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Simulated Map Overlays — Not Verified</h3>
             <div className="flex items-start gap-3 p-3 rounded-xl border border-purple-200 bg-purple-50">
               <Checkbox
                 id="vulnerability-heatmap"
@@ -294,7 +297,7 @@ export default function LiveMap() {
                   <Users className="h-4 w-4 text-purple-700" />
                   <span className="text-sm font-bold text-purple-900">Socio-Economic Vulnerability Heatmap</span>
                 </div>
-                <p className="text-[10px] text-purple-700 mt-1">Highlight high-density, low-income & elderly-majority neighborhoods for rescue prioritization</p>
+                <p className="text-[10px] text-purple-700 mt-1">Illustrative vulnerability zones only. Not actual demographic or rescue-priority data</p>
               </label>
             </div>
             <div className="flex items-start gap-3 p-3 rounded-xl border border-amber-200 bg-amber-50">
@@ -309,7 +312,7 @@ export default function LiveMap() {
                   <History className="h-4 w-4 text-amber-700" />
                   <span className="text-sm font-bold text-amber-900">Historical Comparison</span>
                 </div>
-                <p className="text-[10px] text-amber-700 mt-1">Overlay high-water marks from 2012 &amp; 2022 flood events alongside current levels</p>
+                <p className="text-[10px] text-amber-700 mt-1">Illustrative historical markers, not verified water-level records or current measurements</p>
               </label>
             </div>
             <div className="flex items-start gap-3 p-3 rounded-xl border border-green-200 bg-green-50">
@@ -324,7 +327,7 @@ export default function LiveMap() {
                   <Route className="h-4 w-4 text-green-700" />
                   <span className="text-sm font-bold text-green-900">Evacuation Route Highlights</span>
                 </div>
-                <p className="text-[10px] text-green-700 mt-1">Display glowing green corridors showing safest, entirely dry evacuation routes</p>
+                <p className="text-[10px] text-green-700 mt-1">Illustrative corridors only. No route has been checked for flooding or safety</p>
               </label>
             </div>
           </div>
@@ -459,7 +462,7 @@ export default function LiveMap() {
                   <Badge className={cn("mt-1", RISK_LEVELS[city.risk as keyof typeof RISK_LEVELS].bg)}>
                     {RISK_LEVELS[city.risk as keyof typeof RISK_LEVELS].label}
                   </Badge>
-                  <p className="text-xs mt-2">Flood Probability: {city.probability}%</p>
+                  <p className="text-xs mt-2">Simulated flood probability: {city.probability}% — not a forecast</p>
                 </div>
               </Popup>
             </Circle>
@@ -483,7 +486,7 @@ export default function LiveMap() {
               <Popup>
                 <div className="p-1">
                   <h4 className="font-bold text-primary">{fac.name}</h4>
-                  <p className="text-xs text-muted-foreground">{fac.type}</p>
+                  <p className="text-xs text-muted-foreground">{fac.type} — illustrative location, not a verified shelter</p>
                 </div>
               </Popup>
             </Marker>
@@ -511,7 +514,7 @@ export default function LiveMap() {
                   <Badge className="mt-1" style={{ backgroundColor: VULNERABILITY_LEVELS[zone.level].color, color: "#fff" }}>
                     {VULNERABILITY_LEVELS[zone.level].label} Vulnerability
                   </Badge>
-                  <p className="text-xs mt-2 font-medium">{zone.density}</p>
+                  <p className="text-xs mt-2 font-medium">Demo only — {zone.density}</p>
                   <p className="text-[10px] text-muted-foreground">{zone.detail}</p>
                   <p className="text-[10px] mt-1 font-semibold text-purple-700">{VULNERABILITY_LEVELS[zone.level].description}</p>
                 </div>
@@ -535,7 +538,7 @@ export default function LiveMap() {
               <Popup>
                 <div className="p-1">
                   <h4 className="font-bold text-amber-900">{event.name}</h4>
-                  <Badge className="mt-1 bg-amber-700 text-[10px]">{event.year} Flood Event</Badge>
+                  <Badge className="mt-1 bg-amber-700 text-[10px]">Illustrative {event.year} marker</Badge>
                   <p className="text-xs mt-2">Water Level: <strong>{event.waterLevel}</strong></p>
                   <p className="text-[10px] text-muted-foreground">Affected: {event.affected}</p>
                 </div>
