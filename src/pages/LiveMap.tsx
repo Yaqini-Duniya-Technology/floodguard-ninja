@@ -146,6 +146,17 @@ const MAP_LAYERS = {
 };
 
 export default function LiveMap() {
+  const apiBase = import.meta.env.VITE_FLOODGUARD_API_URL?.replace(/\/$/, "");
+  const [evidence, setEvidence] = React.useState<{warning:string; observations:Array<{latitude:number;longitude:number;summary:string;source_name:string;source_url:string;observed_at:string}>}|null>(null);
+  const [evidenceError, setEvidenceError] = React.useState("");
+  React.useEffect(() => {
+    if (!apiBase) { setEvidenceError("Evidence API not configured"); return; }
+    const controller = new AbortController();
+    fetch(`${apiBase}/api/v1/flood-risk/assess`, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({latitude:7.8023,longitude:6.7333}),signal:controller.signal})
+      .then(async r => {if (!r.ok) throw new Error("Evidence service unavailable");return r.json();})
+      .then(setEvidence).catch(e => {if (!controller.signal.aborted) setEvidenceError(String(e));});
+    return () => controller.abort();
+  }, [apiBase]);
   const [selectedCity, setSelectedCity] = React.useState(locations[0]);
   const [showVulnerability, setShowVulnerability] = React.useState(false);
   const [showEvacuationRoute, setShowEvacuationRoute] = React.useState(false);
@@ -190,9 +201,16 @@ export default function LiveMap() {
             </Card>
           </div>
 
+          <div role="status" className="rounded-lg border border-amber-400 bg-amber-50 p-3 text-sm text-amber-950">
+            <strong>DEMONSTRATION ONLY — NOT LIVE FLOOD WARNINGS</strong>
+            <p>Risk percentages, weather, facilities and evacuation routes shown here are illustrative, not verified emergency information.</p>
+            <p className="mt-2 font-semibold">Sourced evidence near Lokoja:</p>
+            <p>{evidenceError || evidence?.warning || "Checking evidence…"}</p>
+            {evidence?.observations.map((obs,i) => <p key={i}>{obs.summary} — <a className="underline" href={obs.source_url} target="_blank" rel="noopener noreferrer">{obs.source_name}</a> ({new Date(obs.observed_at).toLocaleDateString()})</p>)}
+          </div>
           {/* Critical Alerts */}
           <div className="space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Active Alerts</h3>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Simulated Alerts</h3>
             {locations.filter(l => l.risk === "HIGH" || l.risk === "EXTREME").map(city => (
               <div 
                 key={city.id}
@@ -203,9 +221,9 @@ export default function LiveMap() {
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-red-900">{city.name}</span>
-                    <Badge variant="destructive" className="text-[10px] uppercase">Immediate</Badge>
+                    <Badge variant="destructive" className="text-[10px] uppercase">Demo</Badge>
                   </div>
-                  <p className="text-[10px] text-red-700">Probability: {city.probability}% - Evacuate now.</p>
+                  <p className="text-[10px] text-red-700">Probability: {city.probability}% - Demo only — not an evacuation order.</p>
                 </div>
               </div>
             ))}
@@ -213,7 +231,7 @@ export default function LiveMap() {
 
           {/* Risk List */}
           <div className="space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Community Risks</h3>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Demo Community Risks</h3>
             <div className="space-y-2">
               {locations.map(city => (
                 <button
@@ -301,7 +319,7 @@ export default function LiveMap() {
             onClick={() => setShowEvacuationRoute(!showEvacuationRoute)}
           >
             <Route className="h-4 w-4" />
-            {showEvacuationRoute ? "Hide Evacuation Route" : "Get Evacuation Route"}
+            {showEvacuationRoute ? "Hide Evacuation Route" : "View Example Route"}
           </Button>
 
           {showEvacuationRoute && (
@@ -327,7 +345,7 @@ export default function LiveMap() {
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-green-600" />
-                      <span className="text-xs font-bold text-green-900">AI-Optimized Route</span>
+                      <span className="text-xs font-bold text-green-900">Illustrative Route — Not Verified</span>
                     </div>
                     <Badge className="bg-green-600 text-[10px]">Active</Badge>
                   </div>
@@ -400,7 +418,8 @@ export default function LiveMap() {
             } as any)}
           />
           
-          {/* Risk Areas */}
+          {evidence?.observations.map((obs,i) => <Circle key={`evidence-${i}`} {...({center:[obs.latitude,obs.longitude],radius:450,pathOptions:{color:"#2563eb",fillColor:"#2563eb",fillOpacity:0.2}} as any)}><Popup><strong>Sourced observation — not a prediction</strong><p>{obs.summary}</p><a href={obs.source_url} target="_blank" rel="noopener noreferrer">{obs.source_name}</a></Popup></Circle>)}
+          {/* Risk Areas — illustrative */}
           {locations.map(city => (
             <Circle
               key={city.id}
@@ -525,7 +544,7 @@ export default function LiveMap() {
                   <h4 className="font-bold text-green-900">{corridor.name}</h4>
                   <Badge className="mt-1 bg-green-600 text-[10px]">{corridor.status}</Badge>
                   <p className="text-xs mt-2 font-medium">{corridor.elevation} Route</p>
-                  <p className="text-[10px] text-muted-foreground">Safest dry evacuation path</p>
+                  <p className="text-[10px] text-muted-foreground">Illustrative route; not validated</p>
                 </div>
               </Popup>
             </Polyline>
