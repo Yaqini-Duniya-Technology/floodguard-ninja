@@ -145,18 +145,33 @@ const MAP_LAYERS = {
   POPULATION: { label: "Population Density", icon: "BarChart3", url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" },
 };
 
+const EVIDENCE_LOCATIONS = [
+  { name: "Lokoja, Kogi", latitude: 7.8023, longitude: 6.7333 },
+  { name: "Makurdi, Benue", latitude: 7.7322, longitude: 8.5214 },
+  { name: "Asaba, Delta", latitude: 6.1978, longitude: 6.7324 },
+  { name: "Onitsha, Anambra", latitude: 6.1437, longitude: 6.7844 },
+  { name: "Abuja, FCT", latitude: 9.0765, longitude: 7.3986 },
+  { name: "Lagos, Lagos", latitude: 6.5244, longitude: 3.3792 },
+  { name: "Port Harcourt, Rivers", latitude: 4.8156, longitude: 7.0498 },
+  { name: "Yenagoa, Bayelsa", latitude: 4.9247, longitude: 6.2642 },
+];
+
 export default function LiveMap() {
   const apiBase = import.meta.env.VITE_FLOODGUARD_API_URL?.replace(/\/$/, "");
   const [evidence, setEvidence] = React.useState<{warning:string; observations:Array<{latitude:number;longitude:number;summary:string;source_name:string;source_url:string;observed_at:string}>}|null>(null);
   const [evidenceError, setEvidenceError] = React.useState("");
+  const [evidenceLocationIndex, setEvidenceLocationIndex] = React.useState(0);
+  const evidenceLocation = EVIDENCE_LOCATIONS[evidenceLocationIndex];
   React.useEffect(() => {
     if (!apiBase) { setEvidenceError("Evidence API not configured"); return; }
     const controller = new AbortController();
-    fetch(`${apiBase}/api/v1/flood-risk/assess`, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({latitude:7.8023,longitude:6.7333}),signal:controller.signal})
+    setEvidence(null);
+    setEvidenceError("");
+    fetch(`${apiBase}/api/v1/flood-risk/assess`, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({latitude:evidenceLocation.latitude,longitude:evidenceLocation.longitude}),signal:controller.signal})
       .then(async r => {if (!r.ok) throw new Error("Evidence service unavailable");return r.json();})
       .then(setEvidence).catch(e => {if (!controller.signal.aborted) setEvidenceError(String(e));});
     return () => controller.abort();
-  }, [apiBase]);
+  }, [apiBase, evidenceLocation.latitude, evidenceLocation.longitude]);
   const [selectedCity, setSelectedCity] = React.useState(locations[0]);
   const [showVulnerability, setShowVulnerability] = React.useState(false);
   const [showEvacuationRoute, setShowEvacuationRoute] = React.useState(false);
@@ -204,7 +219,11 @@ export default function LiveMap() {
           <div role="status" className="rounded-lg border border-amber-400 bg-amber-50 p-3 text-sm text-amber-950">
             <strong>DEMONSTRATION ONLY — NOT LIVE FLOOD WARNINGS</strong>
             <p>Risk percentages, weather, facilities and evacuation routes shown here are illustrative, not verified emergency information.</p>
-            <p className="mt-2 font-semibold">Sourced evidence near Lokoja:</p>
+            <label htmlFor="evidence-location" className="mt-2 block font-semibold">Check sourced evidence near:</label>
+            <select id="evidence-location" className="mt-1 w-full rounded border border-amber-600 bg-white p-2 text-slate-900" value={evidenceLocationIndex} onChange={event => setEvidenceLocationIndex(Number(event.target.value))}>
+              {EVIDENCE_LOCATIONS.map((place, index) => <option key={place.name} value={index}>{place.name}</option>)}
+            </select>
+            <p className="mt-2 text-xs">Reference city coordinates only. No validated nationwide coverage or real-time flood warnings are implied.</p>
             <p>{evidenceError || evidence?.warning || "Checking evidence…"}</p>
             {evidence?.observations.map((obs,i) => <p key={i}>{obs.summary} — <a className="underline" href={obs.source_url} target="_blank" rel="noopener noreferrer">{obs.source_name}</a> ({new Date(obs.observed_at).toLocaleDateString()})</p>)}
           </div>
