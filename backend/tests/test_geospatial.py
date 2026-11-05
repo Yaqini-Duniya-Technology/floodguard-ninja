@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timezone
 from fastapi.testclient import TestClient
 from app.main import app
 from app.geospatial import distance_km
@@ -17,7 +18,7 @@ def test_bad_coordinates():
 
 def test_evidence_context_not_risk_prediction(tmp_path, monkeypatch):
     file = tmp_path / 'evidence.json'
-    file.write_text(json.dumps([{'latitude': 9.1, 'longitude': 7.4, 'observed_at': '2026-10-19T12:00:00Z', 'source_name': 'Test only', 'source_url': 'https://example.org/test', 'kind': 'flood_observation', 'summary': 'Test observation, not live data', 'radius_km': 5}]))
+    file.write_text(json.dumps([{'latitude': 9.1, 'longitude': 7.4, 'observed_at': datetime.now(timezone.utc).isoformat(), 'source_name': 'Test only', 'source_url': 'https://example.org/test', 'kind': 'flood_observation', 'summary': 'Test observation, not live data', 'radius_km': 5}]))
     monkeypatch.setenv('FLOODGUARD_EVIDENCE_FILE', str(file))
     result = client.post('/api/v1/flood-risk/assess', json={'latitude': 9.1, 'longitude': 7.4})
     assert result.status_code == 200
