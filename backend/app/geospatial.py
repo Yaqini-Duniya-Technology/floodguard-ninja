@@ -9,7 +9,7 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Literal
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 router = APIRouter(prefix='/api/v1/flood-risk', tags=['flood-risk'])
@@ -23,7 +23,7 @@ class Observation(BaseModel):
     longitude: float = Field(ge=-180, le=180)
     observed_at: datetime
     source_name: str = Field(min_length=1)
-    source_url: str = Field(min_length=1)
+    source_url: str = Field(min_length=1, pattern=r'^https://')
     kind: Literal['flood_observation', 'official_warning', 'flood_hazard_map']
     summary: str = Field(min_length=1)
     radius_km: float = Field(gt=0, le=100)
@@ -53,7 +53,6 @@ def load_observations() -> list[Observation]:
 @router.post('/assess', response_model=Assessment)
 def assess(payload: AssessIn):
     # Fail closed if the operator's evidence file is malformed.
-    from fastapi import HTTPException
     try:
         evidence = load_observations()
     except (OSError, ValueError, json.JSONDecodeError):
@@ -64,3 +63,11 @@ def assess(payload: AssessIn):
         warning=('Nearby sourced observations are available. They do not establish safety or predict building-level flood risk.'
                  if nearby else 'No validated local flood evidence is configured. Flood risk is unknown; absence of data does not mean safety.'),
         observations=nearby[:20], assessed_at=datetime.now(timezone.utc))
+
+@router.get('/observations', response_model=list[Observation])
+def observations():
+    """Return sourced observations only, never invented risk scores."""
+    try:
+        return load_observations()
+    except (OSError, ValueError, json.JSONDecodeError):
+        raise HTTPException(status_code=503, detail='Risk evidence service unavailable')
