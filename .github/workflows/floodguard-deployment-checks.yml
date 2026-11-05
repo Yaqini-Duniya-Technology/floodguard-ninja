@@ -1,7 +1,7 @@
 name: FloodGuard deployment checks
 on:
   pull_request:
-    branches: [main]
+    branches: [main, deploy/floodguard-v2.8]
   workflow_dispatch:
 jobs:
   source-gate:
