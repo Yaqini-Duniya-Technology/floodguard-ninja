@@ -178,7 +178,9 @@ export default function LiveMap() {
   const [activeRoute, setActiveRoute] = React.useState(evacuationRoutes[0]);
   const [activeLayer, setActiveLayer] = React.useState<keyof typeof MAP_LAYERS>("STANDARD");
   const [tileError, setTileError] = React.useState(false);
-  React.useEffect(() => { setTileError(false); }, [activeLayer, evidenceLocationIndex]);
+  const [tileFailures, setTileFailures] = React.useState(0);
+  const [tileLoaded, setTileLoaded] = React.useState(0);
+  React.useEffect(() => { setTileError(false); setTileFailures(0); setTileLoaded(0); }, [activeLayer, evidenceLocationIndex]);
   const [showLegend, setShowLegend] = React.useState(true);
   const [showHistorical, setShowHistorical] = React.useState(false);
   const [showEvacuationCorridors, setShowEvacuationCorridors] = React.useState(false);
@@ -427,7 +429,7 @@ export default function LiveMap() {
 
       {/* Map Container */}
       <div className="flex-1 relative bg-muted z-0">
-        {tileError && <div role="alert" className="absolute top-3 left-3 right-3 z-[1200] rounded bg-amber-50 border border-amber-600 p-3 text-sm text-amber-950">Map imagery could not load from the external tile provider. Check your internet connection, browser network requests, or try another map layer. This is not a flood-data result.</div>}
+        {tileError && <div role="alert" className="absolute top-3 left-3 right-3 z-[1200] rounded bg-amber-50 border border-amber-600 p-3 text-sm text-amber-950">{MAP_LAYERS[activeLayer].label} imagery failed to load ({tileFailures} tile request(s) failed; {tileLoaded} loaded). Check DevTools → Network → Img for the failing URL and HTTP status. External map imagery is independent of flood evidence.</div>}
         <MapContainer 
           key={`evidence-map-${evidenceLocationIndex}`}
           {...({
@@ -439,7 +441,7 @@ export default function LiveMap() {
         >
           <TileLayer
             key={activeLayer}
-            eventHandlers={{ tileerror: () => setTileError(true), tileload: () => setTileError(false) }}
+            eventHandlers={{ tileerror: () => { setTileFailures(n => n + 1); setTileError(true); }, tileload: () => { setTileLoaded(n => n + 1); } }}
             {...({
               attribution: activeLayer === "SATELLITE" ? '&copy; Esri, Maxar, Earthstar Geographics' : activeLayer === "TOPOGRAPHIC" ? '&copy; OpenTopoMap (CC-BY-SA)' : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
               url: MAP_LAYERS[activeLayer].url,
