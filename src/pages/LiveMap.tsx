@@ -177,6 +177,8 @@ export default function LiveMap() {
   const [showEvacuationRoute, setShowEvacuationRoute] = React.useState(false);
   const [activeRoute, setActiveRoute] = React.useState(evacuationRoutes[0]);
   const [activeLayer, setActiveLayer] = React.useState<keyof typeof MAP_LAYERS>("STANDARD");
+  const [tileError, setTileError] = React.useState(false);
+  React.useEffect(() => { setTileError(false); }, [activeLayer, evidenceLocationIndex]);
   const [showLegend, setShowLegend] = React.useState(true);
   const [showHistorical, setShowHistorical] = React.useState(false);
   const [showEvacuationCorridors, setShowEvacuationCorridors] = React.useState(false);
@@ -425,6 +427,7 @@ export default function LiveMap() {
 
       {/* Map Container */}
       <div className="flex-1 relative bg-muted z-0">
+        {tileError && <div role="alert" className="absolute top-3 left-3 right-3 z-[1200] rounded bg-amber-50 border border-amber-600 p-3 text-sm text-amber-950">Map imagery could not load from the external tile provider. Check your internet connection, browser network requests, or try another map layer. This is not a flood-data result.</div>}
         <MapContainer 
           key={`evidence-map-${evidenceLocationIndex}`}
           {...({
@@ -435,6 +438,8 @@ export default function LiveMap() {
           } as any)}
         >
           <TileLayer
+            key={activeLayer}
+            eventHandlers={{ tileerror: () => setTileError(true), tileload: () => setTileError(false) }}
             {...({
               attribution: activeLayer === "SATELLITE" ? '&copy; Esri, Maxar, Earthstar Geographics' : activeLayer === "TOPOGRAPHIC" ? '&copy; OpenTopoMap (CC-BY-SA)' : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
               url: MAP_LAYERS[activeLayer].url,
@@ -583,7 +588,7 @@ export default function LiveMap() {
                 "flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all",
                 activeLayer === "STANDARD" ? "bg-primary text-primary-foreground shadow-md" : "text-foreground hover:bg-muted"
               )}
-              title="Standard Map"
+              title="Standard street map (not satellite imagery)"
             >
               <MapPin className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Standard</span>
@@ -594,7 +599,7 @@ export default function LiveMap() {
                 "flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all",
                 activeLayer === "SATELLITE" ? "bg-primary text-primary-foreground shadow-md" : "text-foreground hover:bg-muted"
               )}
-              title="Satellite View"
+              title="Satellite imagery from Esri (external provider)"
             >
               <Satellite className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Satellite</span>
@@ -616,10 +621,10 @@ export default function LiveMap() {
                 "flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all",
                 activeLayer === "POPULATION" ? "bg-primary text-primary-foreground shadow-md" : "text-foreground hover:bg-muted"
               )}
-              title="Population Density"
+              title="Standard basemap only — population density data unavailable"
             >
               <BarChart3 className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Population</span>
+              <span className="hidden sm:inline">Base map</span>
             </button>
           </div>
         </div>
