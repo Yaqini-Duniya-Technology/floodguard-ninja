@@ -163,13 +163,13 @@ export default function LiveMap() {
   const [evidenceLocationIndex, setEvidenceLocationIndex] = React.useState(0);
   const evidenceLocation = EVIDENCE_LOCATIONS[evidenceLocationIndex];
   React.useEffect(() => {
-    if (!apiBase) { setEvidenceError("Evidence API not configured"); return; }
+    if (!apiBase) { setEvidence(null); setEvidenceError("Evidence API is not configured. Set VITE_FLOODGUARD_API_URL in the Vercel environment and redeploy the preview."); return; }
     const controller = new AbortController();
     setEvidence(null);
     setEvidenceError("");
     fetch(`${apiBase}/api/v1/flood-risk/assess`, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({latitude:evidenceLocation.latitude,longitude:evidenceLocation.longitude}),signal:controller.signal})
       .then(async r => {if (!r.ok) throw new Error("Evidence service unavailable");return r.json();})
-      .then(setEvidence).catch(e => {if (!controller.signal.aborted) setEvidenceError(String(e));});
+      .then(setEvidence).catch(() => {if (!controller.signal.aborted) setEvidenceError("Cannot connect to the evidence API. Check the configured backend URL, its /health endpoint, and CORS permission for this preview domain. Risk remains unknown.");});
     return () => controller.abort();
   }, [apiBase, evidenceLocation.latitude, evidenceLocation.longitude]);
   const [selectedCity, setSelectedCity] = React.useState(locations[0]);
@@ -180,7 +180,7 @@ export default function LiveMap() {
   const [showLegend, setShowLegend] = React.useState(true);
   const [showHistorical, setShowHistorical] = React.useState(false);
   const [showEvacuationCorridors, setShowEvacuationCorridors] = React.useState(false);
-  const center: [number, number] = [7.8023, 6.7333];
+  const center: [number, number] = [evidenceLocation.latitude, evidenceLocation.longitude];
 
   return (
     <div className="flex flex-col lg:flex-row h-[calc(100vh-64px)] overflow-hidden">
@@ -223,7 +223,7 @@ export default function LiveMap() {
             <select id="evidence-location" className="mt-1 w-full rounded border border-amber-600 bg-white p-2 text-slate-900" value={evidenceLocationIndex} onChange={event => setEvidenceLocationIndex(Number(event.target.value))}>
               {EVIDENCE_LOCATIONS.map((place, index) => <option key={place.name} value={index}>{place.name}</option>)}
             </select>
-            <p className="mt-2 text-xs">Reference city coordinates only. No validated nationwide coverage or real-time flood warnings are implied.</p>
+            <p className="mt-2 text-xs">Map centre: {evidenceLocation.latitude.toFixed(4)}° N, {evidenceLocation.longitude.toFixed(4)}° E. Reference city coordinates only; changing cities does not validate coverage or provide live flood warnings.</p>
             <p>{evidenceError || evidence?.warning || "Checking evidence…"}</p>
             {evidence && <p className="mt-2 text-xs">Evidence assessed: {new Date(evidence.assessed_at).toLocaleString()} (your local time). Recent evidence window: 72 hours.</p>}
             {evidence && evidence.stale_observation_count > 0 && <p className="mt-2 font-semibold">Excluded {evidence.stale_observation_count} outdated or future-dated observation(s). Exclusion does not mean this location is safe.</p>}
@@ -426,6 +426,7 @@ export default function LiveMap() {
       {/* Map Container */}
       <div className="flex-1 relative bg-muted z-0">
         <MapContainer 
+          key={`evidence-map-${evidenceLocationIndex}`}
           {...({
             center: center,
             zoom: 11,
@@ -441,8 +442,8 @@ export default function LiveMap() {
           />
           
           {evidence?.observations.map((obs,i) => <Circle key={`evidence-${i}`} {...({center:[obs.latitude,obs.longitude],radius:450,pathOptions:{color:"#2563eb",fillColor:"#2563eb",fillOpacity:0.2}} as any)}><Popup><strong>Sourced observation — not a prediction</strong><p>{obs.summary}</p><a href={obs.source_url} target="_blank" rel="noopener noreferrer">{obs.source_name}</a></Popup></Circle>)}
-          {/* Risk Areas — illustrative */}
-          {locations.map(city => (
+          {/* Risk Areas — illustrative, Lokoja-only demo layer */}
+          {evidenceLocationIndex === 0 && locations.map(city => (
             <Circle
               key={city.id}
               {...({
@@ -469,7 +470,7 @@ export default function LiveMap() {
           ))}
 
           {/* Facilities */}
-          {facilities.map(fac => (
+          {evidenceLocationIndex === 0 && facilities.map(fac => (
             <Marker 
               key={fac.id} 
               {...({
@@ -493,7 +494,7 @@ export default function LiveMap() {
           ))}
 
           {/* Socio-Economic Vulnerability Overlay */}
-          {showVulnerability && vulnerabilityZones.map(zone => (
+          {evidenceLocationIndex === 0 && showVulnerability && vulnerabilityZones.map(zone => (
             <Circle
               key={`vuln-${zone.id}`}
               {...({
@@ -522,7 +523,7 @@ export default function LiveMap() {
             </Circle>
           ))}
           {/* Historical Flood Markers */}
-          {showHistorical && historicalFloodEvents.map(event => (
+          {evidenceLocationIndex === 0 && showHistorical && historicalFloodEvents.map(event => (
             <Marker
               key={`hist-${event.id}`}
               {...({
@@ -546,7 +547,7 @@ export default function LiveMap() {
             </Marker>
           ))}
           {/* Evacuation Route Corridors */}
-          {showEvacuationCorridors && evacuationCorridors.map(corridor => (
+          {evidenceLocationIndex === 0 && showEvacuationCorridors && evacuationCorridors.map(corridor => (
             <Polyline
               key={`corridor-${corridor.id}`}
               {...({
