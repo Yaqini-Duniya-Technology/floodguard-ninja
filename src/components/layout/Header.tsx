@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const navigation = [
+  { name: "Service Model", href: "/plans", icon: LayoutDashboard },
   { name: "Postcode Verification", href: "/postcode", icon: Waves },
   { name: "Safety Guide", href: "/safety", icon: Waves },
   { name: "Safety Notices", href: "/alerts", icon: Bell },
