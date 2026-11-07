@@ -5,10 +5,10 @@ import { motion } from "framer-motion";
 
 export default function WhatsAppBot() {
   const features = [
-    { title: "Flood Alerts", icon: Bell, desc: "Receive automated alerts directly in your WhatsApp chats." },
-    { title: "Risk Info", icon: Info, desc: "Type your location to get instant risk classification (Safe to Extreme)." },
-    { title: "Emergency Help", icon: Shield, desc: "Quick access to emergency protocols and rescue contacts." },
-    { title: "Shelter Locations", icon: Navigation, desc: "Find the nearest verified shelters with GPS directions." },
+    { title: "Flood Alerts", icon: Bell, desc: "Planned capability: WhatsApp alerts are not connected." },
+    { title: "Risk Info", icon: Info, desc: "Planned capability: risk lookup is not available through WhatsApp." },
+    { title: "Emergency Help", icon: Shield, desc: "Read safety guidance in the FloodGuard web app." },
+    { title: "Shelter Locations", icon: Navigation, desc: "Verified shelter lookup is not available through WhatsApp." },
   ];
 
   return (
@@ -29,7 +29,7 @@ export default function WhatsAppBot() {
                 <span className="text-primary">FLOODGUARD 9JA</span>
               </h1>
               <p className="text-lg text-[#075E54]/80 mb-10 leading-relaxed max-w-xl">
-                Get real-time assistance, safety tips, and risk updates through the world's most popular messaging app. Our intelligent WhatsApp bot is available in English, Pidgin, Hausa, Yoruba, and Igbo.
+                WhatsApp integration is a concept demonstration only. No live FloodGuard WhatsApp bot, multilingual response service or automated alert delivery is connected.
               </p>
 
               <div className="grid sm:grid-cols-2 gap-6 mb-10">
@@ -44,11 +44,11 @@ export default function WhatsAppBot() {
                 ))}
               </div>
 
-              <Button size="lg" className="bg-[#25D366] hover:bg-[#128C7E] text-white h-14 px-8 rounded-2xl text-lg shadow-xl shadow-[#25D366]/20 group">
-                <a href="https://wa.me/2348053694199" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
-                  Chat With FLOODGUARD 9JA on WhatsApp
+              <Button disabled size="lg" className="bg-[#25D366] hover:bg-[#128C7E] text-white h-14 px-8 rounded-2xl text-lg shadow-xl shadow-[#25D366]/20 group">
+                <span className="flex items-center gap-3">
+                  WhatsApp integration not yet available
                   <ExternalLink className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </a>
+                </span>
               </Button>
             </div>
 
@@ -66,7 +66,7 @@ export default function WhatsAppBot() {
                     </div>
                     <div>
                       <div className="font-bold text-xs">FLOODGUARD 9JA</div>
-                      <div className="text-[8px] opacity-80">online</div>
+                      <div className="text-[8px] opacity-80">DEMO — NOT CONNECTED</div>
                     </div>
                   </div>
                   
@@ -79,8 +79,8 @@ export default function WhatsAppBot() {
                     </div>
                     <div className="bg-white p-2 rounded-lg rounded-tl-none shadow-sm text-[10px] max-w-[80%]">
                       Checking current data for 📍 Lokoja... <br /><br />
-                      Risk Level: 🔴 <span className="font-bold">HIGH RISK</span><br />
-                      Recommendation: Prepare for evacuation within 48 hours.
+                      Illustrative risk: <span className="font-bold">NOT A LIVE FORECAST</span><br />
+                      Follow verified official alerts; no evacuation time is predicted here.
                     </div>
                     <div className="bg-white p-2 rounded-lg rounded-tl-none shadow-sm text-[10px] max-w-[80%]">
                       Reply with "1" for nearest shelter.
@@ -98,7 +98,7 @@ export default function WhatsAppBot() {
                 {/* Floating Elements */}
                 <div className="absolute -top-10 -right-10 bg-white p-4 rounded-2xl shadow-xl flex items-center gap-3 animate-bounce">
                   <div className="bg-red-500 w-2 h-2 rounded-full"></div>
-                  <span className="text-xs font-bold text-slate-800">New Alert: High Risk</span>
+                  <span className="text-xs font-bold text-slate-800">Illustrative notification only</span>
                 </div>
               </div>
             </div>
