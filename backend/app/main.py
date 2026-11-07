@@ -193,3 +193,6 @@ app.include_router(community_router)
 
 from .command_centre import router as command_centre_router
 app.include_router(command_centre_router)
+
+from .commercial import router as commercial_router
+app.include_router(commercial_router)
