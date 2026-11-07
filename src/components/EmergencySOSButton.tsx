@@ -53,7 +53,7 @@ export function EmergencySOSButton() {
             transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
             className="mb-8 max-w-md text-lg text-white/80"
           >
-            Press the button below to immediately connect with emergency services
+            Open your phone dialler to contact emergency services. FloodGuard cannot confirm a connected call or dispatch.
           </motion.p>
 
           {/* SOS Button - Hero */}

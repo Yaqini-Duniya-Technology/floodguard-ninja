@@ -24,7 +24,7 @@ app = FastAPI(title="FloodGuard API", version="2.8.0", docs_url=None if os.geten
 _rate_hits = defaultdict(deque)
 _rate_lock = Lock()
 origins = [x.strip() for x in os.environ.get("FLOODGUARD_ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:5173").split(",") if x.strip()]
-app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["GET", "POST"], allow_headers=["Content-Type", "Idempotency-Key", "X-Request-ID", "X-Report-Receipt"])
+app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["GET", "POST"], allow_headers=["Content-Type", "Idempotency-Key", "X-Request-ID", "X-Report-Receipt", "X-Demo-Operator-Token"])
 
 @app.middleware("http")
 async def security_middleware(request: Request, call_next):
@@ -178,3 +178,24 @@ app.include_router(readiness_router)
 def service_status():
     enabled = os.getenv("FLOODGUARD_ENV") != "production" or os.getenv("FLOODGUARD_REPORTING_ENABLED", "false").lower() == "true"
     return {"api": "available", "reporting": "enabled" if enabled else "disabled_pending_durable_storage", "dispatch": "not_connected", "postcode_lookup": "not_verified", "flood_prediction": "not_validated"}
+
+from .safety import router as safety_router
+app.include_router(safety_router)
+
+from .incidents import router as incidents_router
+app.include_router(incidents_router)
+
+from .explainability import router as explainability_router
+app.include_router(explainability_router)
+
+from .community import router as community_router
+app.include_router(community_router)
+
+from .command_centre import router as command_centre_router
+app.include_router(command_centre_router)
+
+from .commercial import router as commercial_router
+app.include_router(commercial_router)
+
+from .analytics import router as analytics_router
+app.include_router(analytics_router)

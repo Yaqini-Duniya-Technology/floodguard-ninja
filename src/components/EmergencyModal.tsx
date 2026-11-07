@@ -239,7 +239,7 @@ export function EmergencyModal({ open, onClose }: EmergencyModalProps) {
               <div className="flex items-center gap-2 border-t border-zinc-100 px-6 py-3 dark:border-zinc-800">
                 <Shield className="h-3.5 w-3.5 text-zinc-400" />
                 <p className="text-xs text-zinc-400 dark:text-zinc-500">
-                  Your location is shared only with emergency services
+                  Your location is not automatically shared with emergency services
                 </p>
               </div>
             </div>
