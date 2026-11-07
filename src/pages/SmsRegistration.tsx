@@ -32,7 +32,7 @@ export default function SmsRegistration() {
       storage.saveRegistration(formData);
       setIsSubmitting(false);
       setIsSuccess(true);
-      toast.success("Registration successful! You will now receive alerts.");
+      toast.info("Saved on this device only. SMS alerts are not connected.");
     }, 1500);
   };
 
@@ -55,7 +55,7 @@ export default function SmsRegistration() {
                 <span className="text-accent">Stay Protected.</span>
               </h1>
               <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                FLOODGUARD 9JA ensures that every Nigerian receives life-saving alerts, regardless of internet access or phone type. Register your number to receive real-time SMS warnings for your specific community.
+                SMS warning delivery is planned, but no SMS provider is connected. This page is a local demonstration and does not subscribe your phone to alerts.
               </p>
               
               <div className="space-y-6">
@@ -65,7 +65,7 @@ export default function SmsRegistration() {
                   </div>
                   <div>
                     <h4 className="font-bold text-primary">Zero Internet Required</h4>
-                    <p className="text-sm text-muted-foreground">Receive critical alerts via basic SMS technology.</p>
+                    <p className="text-sm text-muted-foreground">Planned SMS delivery for basic phones; not available yet.</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
@@ -74,13 +74,13 @@ export default function SmsRegistration() {
                   </div>
                   <div>
                     <h4 className="font-bold text-primary">Location-Specific</h4>
-                    <p className="text-sm text-muted-foreground">Alerts are tailored to your LGA and specific community.</p>
+                    <p className="text-sm text-muted-foreground">Location-specific delivery is planned; no messages are being sent.</p>
                   </div>
                 </div>
               </div>
 
               <div className="mt-10 p-6 bg-accent/5 border border-accent/20 rounded-2xl italic text-sm text-primary/80">
-                "Residents may also register their phone numbers at the nearest FloodGuard Community Office to receive life-saving flood alerts via SMS."
+                "No physical FloodGuard registration office or live SMS subscription is verified."
               </div>
             </div>
 
@@ -95,9 +95,9 @@ export default function SmsRegistration() {
                   <div className="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
                     <CheckCircle2 className="h-10 w-10 text-green-600" />
                   </div>
-                  <h2 className="text-2xl font-bold text-primary mb-4">Registration Active</h2>
+                  <h2 className="text-2xl font-bold text-primary mb-4">Demo details saved locally</h2>
                   <p className="text-muted-foreground mb-8">
-                    Your number {formData.phone} is now linked to FLOODGUARD 9JA alerts for {formData.community || formData.lga}.
+                    Your number {formData.phone} was saved only on this device for {formData.community || formData.lga}.
                   </p>
                   <Button onClick={() => setIsSuccess(false)} variant="outline" className="w-full">Register Another Number</Button>
                 </motion.div>
@@ -109,7 +109,7 @@ export default function SmsRegistration() {
                 >
                   <Card className="shadow-2xl border-none rounded-3xl overflow-hidden">
                     <CardHeader className="bg-primary text-white p-8">
-                      <CardTitle className="text-2xl">SMS Alert Registration</CardTitle>
+                      <CardTitle className="text-2xl">SMS Registration Demo — Not Connected</CardTitle>
                       <CardDescription className="text-white/70 text-xs">For 2G/3G basic phones and areas with low connectivity.</CardDescription>
                     </CardHeader>
                     <CardContent className="p-8">
@@ -178,10 +178,10 @@ export default function SmsRegistration() {
                           />
                         </div>
                         <Button type="submit" className="w-full h-12 text-lg bg-primary hover:bg-primary/90 rounded-xl" disabled={isSubmitting}>
-                          {isSubmitting ? "Processing..." : "Register Now"}
+                          {isSubmitting ? "Processing..." : "Save Demo Details Locally"}
                         </Button>
                         <p className="text-[10px] text-center text-muted-foreground">
-                          By registering, you agree to receive emergency alerts. Standard SMS rates do not apply.
+                          Demo only. Details are saved in this browser, not transmitted to an SMS provider. No SMS delivery or pricing is available.
                         </p>
                       </form>
                     </CardContent>
