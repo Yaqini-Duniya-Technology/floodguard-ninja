@@ -28,3 +28,27 @@ npm ci
 npm run build
 
 Tests and build are not yet verified in this change.
+
+## FGA-002 — Demo-only status workflow (added)
+- POST /api/v1/incidents/{report_id}/transitions
+  - Header: X-Demo-Operator-Token (configured by FLOODGUARD_DEMO_OPERATOR_TOKEN; minimum 24 characters).
+  - Disabled when FLOODGUARD_ENV=production.
+  - Allowed transitions: PENDING → ACKNOWLEDGED → ASSIGNED → RESPONDING → RESOLVED, plus configured ESCALATED/CANCELLED paths.
+  - All updates are simulated, not verified responder actions.
+- GET /api/v1/incidents/{report_id}/timeline
+  - Header: X-Report-Receipt (private token from report creation).
+  - Returns timestamped status changes without exposing the operator note.
+- Tests: backend/tests/test_incidents.py.
+- The demonstration operator token is not a replacement for real institutional RBAC, MFA or a responder integration. Never enable this workflow for public production use.
+
+### PowerShell verification
+```powershell
+git fetch origin
+git switch feature/fga-batch1-emergency-safety
+cd backend
+python -m pip install -r requirements.txt
+python -m pytest tests/test_safety.py tests/test_incidents.py tests/test_reports.py -q
+cd ..
+npm ci
+npm run build
+```
