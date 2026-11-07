@@ -24,3 +24,12 @@
 - Community reports are unverified and are not public warnings.
 - Commercial tiers are proposals; no payment or active subscriptions.
 - Automated tests and builds do not validate live emergency response or external service integration.
+
+## Security review update — 7 November 2026
+- Reviewed demo operator guard: now requires FLOODGUARD_ENV=test or demo explicitly; absent, staging, development and production environments fail closed.
+- Incident transition updates now reject stale concurrent status changes.
+- Added regression test for fail-closed operator access.
+- Source inspection confirms demo walkthrough has explicit disclaimers, links to real routes and no simulated agency acknowledgement.
+- The NIPOST L1 adapter uses a fixed provider URL, test-key-only guard and discards address/coordinate fields, but the external provider contract has not been verified against live documentation.
+- Review of source and CI does **not** constitute penetration testing, live integration verification or manual browser acceptance.
+- This branch is not ready to merge until fresh CI passes after these changes and human review confirms the demo.
