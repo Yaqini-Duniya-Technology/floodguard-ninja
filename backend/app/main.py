@@ -184,3 +184,6 @@ app.include_router(safety_router)
 
 from .incidents import router as incidents_router
 app.include_router(incidents_router)
+
+from .explainability import router as explainability_router
+app.include_router(explainability_router)
