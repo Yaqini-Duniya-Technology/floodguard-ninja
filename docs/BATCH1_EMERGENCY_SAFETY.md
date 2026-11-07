@@ -83,3 +83,13 @@ npm run build
 - If NIPOST access, provider contract or test key is unavailable, the UI shows a verification error rather than a successful result.
 - Level 2/3 capabilities remain out of scope until independently approved and verified.
 - Run npm run build and backend/tests/test_nipost_l1_adapter.py before review.
+
+## FGA-006 — Community report review foundation
+- Existing POST /api/v1/reports accepts descriptive community observations.
+- GET /api/v1/community/{report_id}/review requires X-Report-Receipt and exposes only the review status.
+- POST /api/v1/community/{report_id}/review requires a demo operator token and is disabled when FLOODGUARD_ENV=production.
+- Review decisions: UNVERIFIED, NEEDS_MORE_EVIDENCE, REVIEWED, REJECTED.
+- Review decisions and notes are audited internally. REVIEWED does not mean independently verified, publicly published, official warning, or dispatched.
+- No public list of citizen locations or private reports is exposed.
+- Run: cd backend && python -m pytest tests/test_community.py -q.
+- Remaining: production RBAC, human verification policy, abuse controls, moderation, data retention, and field evidence procedures.
