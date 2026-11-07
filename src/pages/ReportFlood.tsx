@@ -95,7 +95,7 @@ export default function ReportFlood() {
               Community Intelligence
             </h1>
             <p className="text-muted-foreground text-lg">
-              Report rising water levels, blocked drainages, or flooded roads in your area. 
+              Share observations of rising water levels, blocked drainages, or flooded roads in your area. Reports are unverified until reviewed. 
               Reports are stored for review when the central service is available. For immediate danger, call 112.
             </p>
           </div>
@@ -240,12 +240,12 @@ export default function ReportFlood() {
                         {isSubmitting ? (
                           <div className="flex items-center gap-2">
                             <Waves className="h-5 w-5 animate-bounce" />
-                            Uploading Report...
+                            Submitting report...
                           </div>
                         ) : (
                           <div className="flex items-center gap-2">
                             <Send className="h-5 w-5" />
-                            Submit Report to AI
+                            Submit Community Report
                           </div>
                         )}
                       </Button>
