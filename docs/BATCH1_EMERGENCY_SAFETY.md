@@ -101,3 +101,11 @@ npm run build
 - Does not verify responder acknowledgement, dispatch, or government affiliation.
 - Test: python -m pytest tests/test_command_centre.py -q.
 - Before real deployment: role-based agency accounts, audit of read access, institutional agreements, escalation SLAs, data retention and security review.
+
+## FGA-009 — Operational analytics foundation
+- GET /api/v1/analytics/operational-summary is demo-operator protected and disabled in production.
+- Provides total reports, internal status counts, number of simulated transitions and first internal status-change delay where timestamps are valid.
+- Real responder times, successful rescues and alert deliveries remain null; no such data is connected.
+- Does not expose private report descriptions, addresses or receipt tokens.
+- Test: python -m pytest tests/test_analytics.py -q.
+- Remaining: authenticated production reporting, time-series retention, reliability metrics and independently verified emergency-response outcome feeds.
