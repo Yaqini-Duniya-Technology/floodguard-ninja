@@ -187,3 +187,6 @@ app.include_router(incidents_router)
 
 from .explainability import router as explainability_router
 app.include_router(explainability_router)
+
+from .community import router as community_router
+app.include_router(community_router)
