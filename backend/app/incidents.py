@@ -38,8 +38,8 @@ def init(db):
     db.execute("CREATE INDEX IF NOT EXISTS idx_incident_events_report ON incident_events(report_id, id)")
 
 def operator_guard(request: Request):
-    if os.getenv("FLOODGUARD_ENV") == "production":
-        raise HTTPException(503, "Operator workflow not enabled in production")
+    if os.getenv("FLOODGUARD_ENV", "").lower() not in {"test", "demo"}:
+        raise HTTPException(503, "Operator workflow requires an explicitly configured test or demo environment")
     configured = os.getenv("FLOODGUARD_DEMO_OPERATOR_TOKEN", "")
     provided = request.headers.get("X-Demo-Operator-Token", "")
     if len(configured) < 24 or not secrets.compare_digest(configured, provided):
@@ -60,7 +60,9 @@ def transition(report_id: str, payload: Transition, request: Request):
         previous = row["status"]
         if payload.status not in ALLOWED.get(previous, set()):
             raise HTTPException(409, "Invalid incident state transition")
-        db.execute("UPDATE reports SET status=? WHERE id=? AND status=?", (payload.status, report_id, previous))
+        updated = db.execute("UPDATE reports SET status=? WHERE id=? AND status=?", (payload.status, report_id, previous))
+        if updated.rowcount != 1:
+            raise HTTPException(409, "Incident status changed; retry after refreshing")
         db.execute("INSERT INTO incident_events (report_id, previous_status, new_status, note, actor, occurred_at) VALUES (?,?,?,?,?,?)",
                    (report_id, previous, payload.status, payload.note.strip(), "demo_operator", datetime.now(timezone.utc).isoformat()))
     return {"id": report_id, "previous_status": previous, "status": payload.status, "dispatch": "not_connected", "simulation": True}
