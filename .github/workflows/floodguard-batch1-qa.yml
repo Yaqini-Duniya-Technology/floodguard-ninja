@@ -1,0 +1,45 @@
+name: FloodGuard Batch 1 Quality Gate
+
+on:
+  push:
+    branches:
+      - feature/fga-batch1-emergency-safety
+  pull_request:
+    branches:
+      - feature/v2.9-evidence-intelligence
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: Install backend dependencies
+        run: python -m pip install -r backend/requirements.txt
+      - name: Run backend tests
+        working-directory: backend
+        env:
+          FLOODGUARD_ENV: test
+        run: python -m pytest tests -q
+
+  frontend-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: TypeScript and Vite production build
+        run: npm run build
