@@ -178,3 +178,6 @@ app.include_router(readiness_router)
 def service_status():
     enabled = os.getenv("FLOODGUARD_ENV") != "production" or os.getenv("FLOODGUARD_REPORTING_ENABLED", "false").lower() == "true"
     return {"api": "available", "reporting": "enabled" if enabled else "disabled_pending_durable_storage", "dispatch": "not_connected", "postcode_lookup": "not_verified", "flood_prediction": "not_validated"}
+
+from .safety import router as safety_router
+app.include_router(safety_router)
