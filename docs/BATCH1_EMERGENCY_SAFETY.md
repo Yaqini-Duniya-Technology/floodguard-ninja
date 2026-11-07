@@ -93,3 +93,11 @@ npm run build
 - No public list of citizen locations or private reports is exposed.
 - Run: cd backend && python -m pytest tests/test_community.py -q.
 - Remaining: production RBAC, human verification policy, abuse controls, moderation, data retention, and field evidence procedures.
+
+## FGA-007 — Restricted command centre foundation
+- GET /api/v1/command-centre/overview is guarded by the demo operator token and disabled in production.
+- Returns aggregate incident statuses and a limited list of report identifiers, incident type, severity, timestamps, and review status.
+- Does not return descriptive citizen locations, narratives, receipts or reporter identities.
+- Does not verify responder acknowledgement, dispatch, or government affiliation.
+- Test: python -m pytest tests/test_command_centre.py -q.
+- Before real deployment: role-based agency accounts, audit of read access, institutional agreements, escalation SLAs, data retention and security review.
