@@ -67,3 +67,11 @@ npm run build
 - Emergency SOS opens a phone dialler but cannot establish that a call was connected, a location was transmitted, or an agency dispatched.
 - **Privacy follow-up:** local SMS registration collects names and phone numbers without a connected delivery service. Before public deployment, disable collection entirely or implement a documented opt-in, retention and deletion process.
 - Run TypeScript build and inspect all mockup content for misleading risk levels before marking this release ready.
+
+## FGA-004 — Explainable rainfall context (initial)
+- GET /api/v1/explainability/rainfall?latitude=...&longitude=...
+- Reuses the existing Open-Meteo forecast integration; includes source, retrieval time, per-day precipitation and explicit missing flood-exposure factors.
+- Returns classification:null and safe_to_travel:null rather than a fabricated risk score or safety verdict.
+- The service depends on network availability and may return 503 if the forecast provider is unavailable.
+- Backend test: python -m pytest tests/test_explainability.py -q
+- Still needed: independently verified river, terrain, drainage and official warning data; model validation and calibration before any predictive risk classification.
