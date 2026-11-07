@@ -52,3 +52,10 @@ cd ..
 npm ci
 npm run build
 ```
+
+## FGA-003 — Informational in-app notices (initial implementation)
+- /alerts provides bundled informational notices without a network or hardware dependency.
+- Notices are not weather warnings, geofenced alerts, push notifications, SMS, WhatsApp or USSD deliveries.
+- Dismissals are temporary for the current page visit; there is no server persistence or delivery acknowledgement.
+- Future external messaging requires provider integration, user consent, delivery receipts, rate limits and abuse prevention.
+- The existing SMS/USSD/WhatsApp pages must be independently audited before claiming operational delivery.
