@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useSearchParams } from "react-router-dom";
 import { Camera, MapPin, AlertCircle, Send, CheckCircle2, Waves, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,8 @@ import { submitFloodReport } from "@/lib/reportApi";
 import { resolvePostcode } from "@/lib/postcodeApi";
 
 export default function ReportFlood() {
+  const [searchParams] = useSearchParams();
+  const initialLocation = (searchParams.get("location") || "").slice(0, 500);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [postcode, setPostcode] = React.useState("");
   const [postcodeBusy, setPostcodeBusy] = React.useState(false);
@@ -24,7 +27,7 @@ export default function ReportFlood() {
   const [formData, setFormData] = React.useState({
     type: "",
     severity: "",
-    location: "",
+    location: initialLocation,
     description: ""
   });
 
@@ -34,9 +37,9 @@ export default function ReportFlood() {
     try {
       const result = await resolvePostcode(postcode);
       if (result.status === "verified") {
-        setPostcodeMessage(`Verified: ${[result.lga, result.state].filter(Boolean).join(", ") || result.postcode}. Confirm your location below.`);
+        setPostcodeMessage(`NIPOST L1 test API confirms postcode validity: ${result.postcode}. Your physical location is not verified; describe it below.`);
       } else if (result.status === "invalid") {
-        setPostcodeMessage("NIPOST reports that this postcode is invalid. Check the code and provide a descriptive location.");
+        setPostcodeMessage("NIPOST test API did not confirm this postcode. A dashboard/test API discrepancy has been observed. Describe your location below; reporting remains available.");
       } else {
         setPostcodeMessage("Postcode could not be verified. Enter a descriptive location below.");
       }
@@ -168,11 +171,11 @@ export default function ReportFlood() {
                           <Input id="digital-postcode" value={postcode} maxLength={40} onChange={(e) => { setPostcode(e.target.value); setPostcodeMessage(""); }} placeholder="Enter your digital postcode" />
                           <Button type="button" variant="outline" onClick={checkPostcode} disabled={postcodeBusy || !postcode.trim()}>{postcodeBusy ? "Checking..." : "Verify"}</Button>
                         </div>
-                        <p className="text-xs text-muted-foreground" role="status">{postcodeMessage || "Official postcode verification is pending NIPOST developer access. You can still describe your location manually."}</p>
+                        <p className="text-xs text-muted-foreground" role="status">{postcodeMessage || "Optional L1 test API validity check; a valid postcode does not verify your physical location. You may report without verification."}</p>
                       </div>
 
                       <div className="space-y-2">
-                        <Label>Specific Location</Label>
+                        <Label>Specific Location — user reported, not verified</Label>
                         <div className="relative">
                           <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input 
@@ -183,7 +186,7 @@ export default function ReportFlood() {
                             onChange={(e) => updateField("location", e.target.value)}
                           />
                         </div>
-                        <p className="text-[10px] text-muted-foreground">Enter a clear location description. GPS coordinates are not automatically attached.</p>
+                        <p className="text-[10px] text-muted-foreground">User-reported location (not independently verified). GPS coordinates are not automatically attached.</p>
                       </div>
 
                       <div className="space-y-2">
