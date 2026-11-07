@@ -29,3 +29,11 @@ def test_demo_transitions_and_private_timeline(monkeypatch):
         assert client.get(f"/api/v1/reports/{ref}/status",headers={"X-Report-Receipt":body["receipt_token"]}).json()["status"] == "ACKNOWLEDGED"
         monkeypatch.setenv("FLOODGUARD_ENV", "production")
         assert client.post(url, json={"status":"ASSIGNED"}, headers=headers).status_code == 503
+
+def test_demo_operator_disabled_without_explicit_environment(monkeypatch):
+    from fastapi.testclient import TestClient
+    monkeypatch.setenv("FLOODGUARD_DEMO_OPERATOR_TOKEN", "demo-operator-secret-very-long-123")
+    for environment in ("staging", "development", "Production"):
+        monkeypatch.setenv("FLOODGUARD_ENV", environment)
+        response = TestClient(main.app).get("/api/v1/command-centre/overview", headers={"X-Demo-Operator-Token": "demo-operator-secret-very-long-123"})
+        assert response.status_code == 503
