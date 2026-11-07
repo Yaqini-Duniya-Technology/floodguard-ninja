@@ -75,3 +75,11 @@ npm run build
 - The service depends on network availability and may return 503 if the forecast provider is unavailable.
 - Backend test: python -m pytest tests/test_explainability.py -q
 - Still needed: independently verified river, terrain, drainage and official warning data; model validation and calibration before any predictive risk classification.
+
+## FGA-005 — NIPOST Level 1 validity UI
+- New /postcode route invokes POST /api/v1/postcodes/resolve.
+- Backend restricts requests to explicitly enabled sandbox integration with NIPOST_INTEGRATION_ENABLED=true and a configured NIPOST_API_KEY test credential.
+- Only postcode validity is displayed. No address, LGA, coordinates, or flood-safety inference is fabricated.
+- If NIPOST access, provider contract or test key is unavailable, the UI shows a verification error rather than a successful result.
+- Level 2/3 capabilities remain out of scope until independently approved and verified.
+- Run npm run build and backend/tests/test_nipost_l1_adapter.py before review.
