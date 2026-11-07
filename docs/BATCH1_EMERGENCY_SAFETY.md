@@ -59,3 +59,11 @@ npm run build
 - Dismissals are temporary for the current page visit; there is no server persistence or delivery acknowledgement.
 - Future external messaging requires provider integration, user consent, delivery receipts, rate limits and abuse prevention.
 - The existing SMS/USSD/WhatsApp pages must be independently audited before claiming operational delivery.
+
+## FGA-003 — Existing channel safety audit
+- SMS registration currently saves details to local browser storage only. It does not subscribe users to live SMS messages. Page copy now states this clearly.
+- WhatsApp page is a static mockup. Live bot, automated messages, multilingual chat and verified shelters are not connected; the external chat CTA has been disabled.
+- USSD page is a browser simulation. The former example shortcode is no longer advertised as a live number; no mobile-network integration or pricing is verified.
+- Emergency SOS opens a phone dialler but cannot establish that a call was connected, a location was transmitted, or an agency dispatched.
+- **Privacy follow-up:** local SMS registration collects names and phone numbers without a connected delivery service. Before public deployment, disable collection entirely or implement a documented opt-in, retention and deletion process.
+- Run TypeScript build and inspect all mockup content for misleading risk levels before marking this release ready.
