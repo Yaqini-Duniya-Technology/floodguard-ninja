@@ -3,8 +3,8 @@
 **Target:** PR #4 from `feature/fga-batch1-emergency-safety` into `feature/v2.9-evidence-intelligence`. Never merge into `main` or deploy as part of this review.
 
 ## A. NIPOST authorised Level 1 sandbox integration
-- [ ] Confirm developer dashboard authorisation and L1 access. L2/L3 must not be assumed.
-- [ ] Compare `backend/app/postcode.py` base URL, `/v1/lookup` path, HTTP method, `code`/`level` query parameters, API-key header and response `data.valid` schema with **current official docs**. Current code is an adapter assumption, not independently validated.
+- [x] Dashboard shows a test key tagged L1 with search/lookup scope; Access page shows L1 validity status. L2/L3 must not be assumed.
+- [x] Compared user-provided official NIPOST graded lookup documentation: GET https://api.postcode.gov.ng/v1/lookup, required code, optional integer level (default 1; range 1–5), required X-API-Key header, JSON data.postcode and data.valid. Adapter matches these fields and requests level=1. Actual authenticated response remains untested.
 - [ ] In an isolated **non-production** backend, configure `NIPOST_INTEGRATION_ENABLED=true` and `NIPOST_API_KEY` using an approved sandbox key via environment variables. Do not paste the key into chat, GitHub or frontend env.
 - [ ] Test an officially supplied valid test postcode, an invalid test postcode, missing credentials, unauthorised key, provider outage and rate limiting. Record only redacted status codes and expected behaviour.
 - [ ] Ensure L1 response never exposes address, coordinates or inferred flood safety.
