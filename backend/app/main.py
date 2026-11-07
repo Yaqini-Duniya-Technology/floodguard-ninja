@@ -24,7 +24,7 @@ app = FastAPI(title="FloodGuard API", version="2.8.0", docs_url=None if os.geten
 _rate_hits = defaultdict(deque)
 _rate_lock = Lock()
 origins = [x.strip() for x in os.environ.get("FLOODGUARD_ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:5173").split(",") if x.strip()]
-app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["GET", "POST"], allow_headers=["Content-Type", "Idempotency-Key", "X-Request-ID", "X-Report-Receipt"])
+app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["GET", "POST"], allow_headers=["Content-Type", "Idempotency-Key", "X-Request-ID", "X-Report-Receipt", "X-Demo-Operator-Token"])
 
 @app.middleware("http")
 async def security_middleware(request: Request, call_next):
@@ -181,3 +181,6 @@ def service_status():
 
 from .safety import router as safety_router
 app.include_router(safety_router)
+
+from .incidents import router as incidents_router
+app.include_router(incidents_router)
