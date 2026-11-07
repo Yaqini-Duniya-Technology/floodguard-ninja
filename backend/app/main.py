@@ -196,3 +196,6 @@ app.include_router(command_centre_router)
 
 from .commercial import router as commercial_router
 app.include_router(commercial_router)
+
+from .analytics import router as analytics_router
+app.include_router(analytics_router)
