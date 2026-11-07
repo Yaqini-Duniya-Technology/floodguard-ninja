@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const navigation = [
+  { name: "Safety Guide", href: "/safety", icon: Waves },
+  { name: "Safety Notices", href: "/alerts", icon: Bell },
   { name: "Location Intelligence", href: "/intelligence", icon: Waves },
   { name: "Live Risk Map", href: "/map", icon: Waves },
   { name: "SMS Alerts", href: "/sms", icon: Bell },
