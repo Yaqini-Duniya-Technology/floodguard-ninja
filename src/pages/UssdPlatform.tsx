@@ -35,17 +35,17 @@ export default function UssdPlatform() {
         <div className="max-w-4xl mx-auto text-center mb-16">
           <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-6">
             <Hash className="h-4 w-4 text-primary" />
-            <span className="text-xs font-bold uppercase tracking-wider text-primary">Offline Access</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-primary">Browser-only USSD concept</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-6">
-            Access Flood Information <br />
-            <span className="text-accent">Without Internet.</span>
+            Preview a USSD Menu <br />
+            <span className="text-accent">No Live Network Connection</span>
           </h1>
           <div className="inline-block bg-primary text-primary-foreground px-8 py-4 rounded-3xl text-3xl md:text-5xl font-mono font-bold tracking-widest shadow-xl mb-8">
-            *789#
+            USSD DEMO
           </div>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Our USSD platform allows users on any mobile network to access critical safety information and check risk levels instantly, even on basic feature phones.
+            This is a browser simulation only. No USSD shortcode has been provisioned and no mobile network is connected. Do not dial the example code as a FloodGuard service.
           </p>
         </div>
 
@@ -94,7 +94,7 @@ export default function UssdPlatform() {
                   </div>
                   <div className="flex gap-2 mt-4">
                     <button className="flex-1 bg-slate-200 h-8 rounded text-center leading-8 text-xs font-bold text-muted-foreground" onClick={() => { setStep('menu'); setSelectedState(''); setSelectedLga(''); }}>CANCEL</button>
-                    <button className={`flex-1 bg-primary text-primary-foreground h-8 rounded text-center leading-8 text-xs font-bold transition-opacity ${(!selectedState || !selectedLga) && step !== 'menu' ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={step !== 'menu' && (!selectedState || !selectedLga)} onClick={() => { step === 'menu' ? handleMenuSelect('1') : alert('Risk assessment submitted!') }}>SEND</button>
+                    <button className={`flex-1 bg-primary text-primary-foreground h-8 rounded text-center leading-8 text-xs font-bold transition-opacity ${(!selectedState || !selectedLga) && step !== 'menu' ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={step !== 'menu' && (!selectedState || !selectedLga)} onClick={() => { step === 'menu' ? handleMenuSelect('1') : alert('Demo selection only. No risk assessment was requested or completed.') }}>SEND</button>
                   </div>
                 </div>
               </div>
@@ -132,7 +132,7 @@ export default function UssdPlatform() {
                 Network Coverage
               </h4>
               <p className="text-sm text-muted-foreground">
-                The *789# service is available on MTN, Airtel, Glo, and 9mobile across Nigeria. It works 24/7 and is free of charge during emergency periods.
+                No live USSD service, network availability, operating hours or call pricing has been verified.
               </p>
             </div>
           </div>
