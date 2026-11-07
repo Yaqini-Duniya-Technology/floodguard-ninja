@@ -109,3 +109,11 @@ npm run build
 - Does not expose private report descriptions, addresses or receipt tokens.
 - Test: python -m pytest tests/test_analytics.py -q.
 - Remaining: authenticated production reporting, time-series retention, reliability metrics and independently verified emergency-response outcome feeds.
+
+## FGA-010 — NIPOST guided demo
+- /demo provides a six-step presenter checklist and links to existing frontend routes.
+- The checklist is local component state, not a backend validation or completed integration status.
+- Use fictional reports only in non-production demonstration environments.
+- Demo narrative answers questions on no required wearable, delayed response safety guidance, and free-citizen/institutional-commercial proposal.
+- No government affiliation, official postcode L2 access, emergency dispatch, live alerts or validated risk scores are claimed.
+- Before merging: run frontend typecheck/build and backend pytest, verify all route links, review mobile layout, and resolve any failures.
