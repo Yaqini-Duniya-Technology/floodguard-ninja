@@ -7,6 +7,7 @@ import { EmergencySOSButton } from "./components/EmergencySOSButton";
 import * as React from "react";
 
 // Lazy load pages for better performance
+const DemoReview = React.lazy(() => import("./pages/DemoReview"));
 const DemoMode = React.lazy(() => import("./pages/DemoMode"));
 const Plans = React.lazy(() => import("./pages/Plans"));
 const PostcodeVerification = React.lazy(() => import("./pages/PostcodeVerification"));
@@ -56,6 +57,7 @@ function App() {
                 <Route path="/postcode" element={<PostcodeVerification />} />
                 <Route path="/plans" element={<Plans />} />
                 <Route path="/demo" element={<DemoMode />} />
+                <Route path="/demo-review" element={<DemoReview />} />
                 <Route path="/ussd" element={<UssdPlatform />} />
                 <Route path="/whatsapp" element={<WhatsAppBot />} />
                 <Route path="/download" element={<DownloadApp />} />
