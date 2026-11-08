@@ -53,7 +53,11 @@ def connection():
     if os.getenv("FLOODGUARD_ENV") == "production" and not os.getenv("FLOODGUARD_DB_PATH"):
         raise RuntimeError("Production requires FLOODGUARD_DB_PATH on durable storage")
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(DB_PATH, timeout=10) as db:
+    # sqlite3.Connection as a context manager commits/rolls back but does NOT
+    # close the connection. Explicit close is essential on Windows, where an
+    # open SQLite handle prevents TemporaryDirectory cleanup.
+    db = sqlite3.connect(DB_PATH, timeout=10)
+    try:
         db.row_factory = sqlite3.Row
         db.execute("PRAGMA busy_timeout=10000")
         db.execute("PRAGMA journal_mode=WAL")
@@ -67,7 +71,10 @@ def connection():
             FOREIGN KEY(report_id) REFERENCES reports(id))""")
         db.execute("""CREATE TABLE IF NOT EXISTS report_idempotency (
             key_hash TEXT PRIMARY KEY, payload_hash TEXT NOT NULL, report_id TEXT NOT NULL)""")
-        yield db
+        with db:
+            yield db
+    finally:
+        db.close()
 
 class ReportIn(BaseModel):
     type: str = Field(min_length=1, max_length=80)
