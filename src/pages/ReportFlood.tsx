@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useSearchParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { Camera, MapPin, AlertCircle, Send, CheckCircle2, Waves, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,8 +14,8 @@ import { submitFloodReport } from "@/lib/reportApi";
 import { resolvePostcode } from "@/lib/postcodeApi";
 
 export default function ReportFlood() {
-  const [searchParams] = useSearchParams();
-  const initialLocation = (searchParams.get("location") || "").slice(0, 500);
+  const routeLocation = useLocation();
+  const initialLocation = (typeof routeLocation.state?.manualLocation === "string" ? routeLocation.state.manualLocation : "").slice(0, 240);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [postcode, setPostcode] = React.useState("");
   const [postcodeBusy, setPostcodeBusy] = React.useState(false);
@@ -98,7 +98,7 @@ export default function ReportFlood() {
               Community Intelligence
             </h1>
             <p className="text-muted-foreground text-lg">
-              Share observations of rising water levels, blocked drainages, or flooded roads in your area. Reports are unverified until reviewed. 
+              Prototype demonstration: use fictional incidents only. Do not submit real names, addresses or emergency requests. Reports are unverified until reviewed. 
               Reports are stored for review when the central service is available. For immediate danger, call 112.
             </p>
           </div>
