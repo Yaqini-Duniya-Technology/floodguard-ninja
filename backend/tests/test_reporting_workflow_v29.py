@@ -53,3 +53,17 @@ def test_operator_disabled_in_production(monkeypatch, tmp_path):
     monkeypatch.setenv("FLOODGUARD_DEMO_OPERATOR_TOKEN", DEMO_TOKEN)
     client = TestClient(main.app)
     assert client.get("/api/v1/operator/audit", headers={"X-Demo-Operator-Token": DEMO_TOKEN}).status_code == 503
+
+def test_operator_rejects_missing_wrong_and_production_tokens(monkeypatch, tmp_path):
+    monkeypatch.setattr(main, "DB_PATH", Path(tmp_path) / "negative-access.sqlite3")
+    monkeypatch.setenv("FLOODGUARD_ENV", "demo")
+    monkeypatch.setenv("FLOODGUARD_DEMO_OPERATOR_TOKEN", DEMO_TOKEN)
+    client = TestClient(main.app)
+    paths = ("/api/v1/command-centre/overview", "/api/v1/operator/audit")
+    for path in paths:
+        assert client.get(path).status_code == 403
+        assert client.get(path, headers={"X-Demo-Operator-Token": "incorrect"}).status_code == 403
+        assert client.get(path, headers={"X-Demo-Operator-Token": DEMO_TOKEN}).status_code == 200
+    monkeypatch.setenv("FLOODGUARD_ENV", "production")
+    for path in paths:
+        assert client.get(path, headers={"X-Demo-Operator-Token": DEMO_TOKEN}).status_code == 503
