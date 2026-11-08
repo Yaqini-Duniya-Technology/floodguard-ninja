@@ -73,4 +73,4 @@ async def resolve_postcode(payload: ResolveIn):
     except (ValueError, KeyError, TypeError):
         raise HTTPException(503, 'Postcode verification provider response could not be validated.') from None
     # Intentionally discard all higher-level fields even if unexpectedly returned.
-    return ResolvedLocation(postcode=canonical, status='verified' if valid else 'invalid')
+    return ResolvedLocation(postcode=canonical, status='verified' if valid else 'unconfirmed')
