@@ -151,6 +151,7 @@ def create_report(payload: ReportIn, request: Request):
 
 @app.get("/api/v1/reports/{report_id}/status")
 def report_receipt_status(report_id: str, request: Request):
+    receipt_throttle(request)
     token = request.headers.get("X-Report-Receipt", "")
     if not re.fullmatch(r"[0-9a-f-]{36}", report_id) or len(token) > 128:
         raise HTTPException(404, "Report not found")
@@ -199,3 +200,8 @@ app.include_router(commercial_router)
 
 from .analytics import router as analytics_router
 app.include_router(analytics_router)
+
+from .report_security import router as report_security_router, throttle as receipt_throttle
+from .operator_audit import router as operator_audit_router
+app.include_router(report_security_router)
+app.include_router(operator_audit_router)
