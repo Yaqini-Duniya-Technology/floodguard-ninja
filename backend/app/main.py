@@ -15,6 +15,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 from .postcode import router as postcode_router
+from .nipost_reference import router as nipost_reference_router
 from .geospatial import router as geospatial_router
 from .intelligence import router as intelligence_router
 from .overview import router as overview_router
@@ -172,6 +173,7 @@ def report_receipt_status(report_id: str, request: Request):
 # Future admin access requires authentication, authorization and auditing.
 
 app.include_router(postcode_router)
+app.include_router(nipost_reference_router)
 
 app.include_router(geospatial_router)
 
