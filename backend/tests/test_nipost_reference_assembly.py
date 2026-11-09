@@ -75,3 +75,27 @@ def test_provider_error_is_not_leaked(monkeypatch):
     response = client.get("/api/v1/postcodes/reference/states")
     assert response.status_code == 503
     assert "secret provider diagnostics" not in response.text
+
+def test_live_key_rejected_for_reference_and_assembly(monkeypatch):
+    monkeypatch.setenv("NIPOST_INTEGRATION_ENABLED", "true")
+    monkeypatch.setenv("NIPOST_API_KEY", "nipost_live_should_not_be_used")
+    assert client.get("/api/v1/postcodes/reference/states").status_code == 503
+    response = client.post("/api/v1/postcodes/assemble", json={"state": "FC", "lga": "01", "district": "A01", "area": "KP", "unit": "27"})
+    assert response.status_code == 503
+    assert "nipost_live_should_not_be_used" not in response.text
+
+def test_assembly_rejects_provider_mismatch(monkeypatch):
+    enable(monkeypatch)
+    async def mock_request(self, method, url, **kwargs):
+        return httpx.Response(200, json={"data": {"postcode": "FC-01-A01-KP-28"}})
+    monkeypatch.setattr(httpx.AsyncClient, "request", mock_request)
+    response = client.post("/api/v1/postcodes/assemble", json={"state": "FC", "lga": "01", "district": "A01", "area": "KP", "unit": "27"})
+    assert response.status_code == 503
+    assert "FC-01-A01-KP-28" not in response.text
+
+def test_reference_rejects_malformed_provider_data(monkeypatch):
+    enable(monkeypatch)
+    async def mock_request(self, method, url, **kwargs):
+        return httpx.Response(200, json={"data": {"states": "not-a-list"}})
+    monkeypatch.setattr(httpx.AsyncClient, "request", mock_request)
+    assert client.get("/api/v1/postcodes/reference/states").status_code == 503
