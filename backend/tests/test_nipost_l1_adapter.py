@@ -19,13 +19,13 @@ def test_valid_l1_response_is_verified_without_address(monkeypatch):
     assert res.json()['state'] is None
     assert 'DO NOT DISCLOSE' not in res.text
 
-def test_invalid_from_provider(monkeypatch):
+def test_false_from_sandbox_provider_is_unconfirmed(monkeypatch):
     monkeypatch.setenv('NIPOST_INTEGRATION_ENABLED', 'true')
     monkeypatch.setenv('NIPOST_API_KEY', 'nipost_test_example')
     async def mock_get(self, url, **kwargs):
         return httpx.Response(200, json={'data': {'valid': False}})
     monkeypatch.setattr(httpx.AsyncClient, 'get', mock_get)
-    assert client.post('/api/v1/postcodes/resolve', json={'postcode': 'AD04C09UH20'}).json()['status'] == 'invalid'
+    assert client.post('/api/v1/postcodes/resolve', json={'postcode': 'AD04C09UH20'}).json()['status'] == 'unconfirmed'
 
 def test_live_key_rejected(monkeypatch):
     monkeypatch.setenv('NIPOST_INTEGRATION_ENABLED', 'true')
